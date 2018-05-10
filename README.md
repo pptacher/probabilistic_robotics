@@ -3,4 +3,4 @@ I am working on detailed solutions of exercises of the book "probabilistic robot
 
 ## references
 
-- *Probabilistic robotics*, Sebastian Thrun, Wolfram Burgard and Dieter Fox, [Probabilistic Robotics](https://mitpress.mit.edu/books/probabilistic-robotics)
+- *Probabilistic robotics*, *MIT press*, Sebastian Thrun, Wolfram Burgard and Dieter Fox, [Probabilistic Robotics](https://mitpress.mit.edu/books/probabilistic-robotics)
