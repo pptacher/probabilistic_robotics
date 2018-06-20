@@ -13,7 +13,7 @@
 %Sigma: 3 x 3 x n covariance matrices
 
 % ==============================================================
-function [ X, Sigma, X1, S1 ] = EKF(mu, S, v, z, t)
+function [ X, Sigma ] = EKF(mu, S, v, z, t)
     n = size(v,1);%number of steps
 
     X = zeros(n+1,3);
@@ -35,8 +35,6 @@ function [ X, Sigma, X1, S1 ] = EKF(mu, S, v, z, t)
         %motion update
         X(ii,:) = X(ii-1,:) + v(ii-1,:)*t;
         Sigma(:,:,ii) = Sigma(:,:,ii-1) + s;
-        S1(:,:,ii-1) = Sigma(:,:,ii);
-        X1(ii-1, :) = X(ii,:);
         
         %measurement update
         H = bsxfun(@minus, X(ii,:), B);
