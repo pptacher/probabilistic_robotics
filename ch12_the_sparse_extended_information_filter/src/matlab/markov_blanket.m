@@ -4,7 +4,6 @@
 %written by Pierre-Paul TACHER (ptacher@gmail.com)
 
 %n: index of landmark (starts from 1)
-%D: pair distances of adjacency information graph 
 
 %mb: list of landmarks in combined markov blanket
 
@@ -13,15 +12,44 @@ function [ mb ] = markov_blanket(n,m0)
     
     global G;
     
-    mb1 = m0;
-    mb2 = neighbors(G,n+1)'-1;
+    mb1 = m0+1;
+    mb2 = neighbors(G,n+1)';
 
-    if isempty(intersect(mb1,mb2))
-        mb = shortestpath(G,1,n+1);
-        if ~isempty(mb)%should never be empty
-            mb2 = union( mb2,mb-1);
-        end
+     if isempty(intersect_int(mb1,mb2))
+         mb = shortestpath(G,1,n+1);%%%%%%%%%%%%%%%this shoul not be empty
+         if ~isempty(mb)
+             mb2 = union_int( mb2,mb);
+         end
     end
-    mb = union([0 n],union(mb1,mb2),'stable');
+
+    mb2 = [1 n+1 mb2];
+    mb = union_int(mb1,mb2);
+    mb=mb-1;
     
 end
+
+
+function [ z ] = union_int(m1,m2)
+global xi;
+
+s=(size(xi,1)-3)/2+1;
+x=zeros(1,s);
+y=zeros(1,s);
+x(m1) = 1;
+y(m2) = 1;
+z = find(x | y);
+
+
+end
+
+function [ z ] = intersect_int(m1,m2)
+global xi;
+s=(size(xi,1)-3)/2+1;
+x=zeros(1,s);
+y=zeros(1,s);
+x(m1) = 1;
+y(m2) = 1;
+z = find(x & y);
+
+end
+

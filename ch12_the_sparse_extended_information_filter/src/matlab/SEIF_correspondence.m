@@ -3,9 +3,6 @@
 % SEIF correspondence determination
 %written by Pierre-Paul TACHER (ptacher@gmail.com)
 
-%xi: information vector
-%O: information matrix
-%m: current mean estimate
 %z: N x 2 measurements
 
 %c: indexes of landmarks corresponding to observations
@@ -16,10 +13,7 @@ function [ c ] = SEIF_correspondence( z,m0)
     
 
     global G;global Q;
-    
-    global num;global corresp1;
-    
-    
+
     global m xi O
     k = size(z,2);
     if k==0
@@ -46,7 +40,7 @@ function [ c ] = SEIF_correspondence( z,m0)
             
                 ind = markov_blanket(lst(ii),m0);
                 
-                ind=ind(2:end);ind=sort(ind,2);
+                ind=ind(2:end);
                 c1 = 2 + 2*ind;c2=c1+1;ind=reshape([c1;c2],[1,2*size(ind,2)]);
             
                 ind1 = find(ind==2+2*lst(ii));
