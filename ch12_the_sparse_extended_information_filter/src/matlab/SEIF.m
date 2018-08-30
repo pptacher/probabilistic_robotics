@@ -95,7 +95,7 @@ stindex=20000;
     
         SEIF_motion(speed(i),steering(i),dt,m0);
     
-        SEIF_estimate2();
+        SEIF_estimate(m0);
 
          while j <= L && timeLsr(j) < time(i)+dt*1000 
              m3 = zeros(1,0);c=zeros(1,0);
