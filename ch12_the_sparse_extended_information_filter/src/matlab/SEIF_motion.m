@@ -47,8 +47,7 @@ function [ ] = SEIF_motion(v, a, t,m0)
         edges=unique(sort([s;t],1)','rows')';
         edges=edges(:,edges(1,:)-edges(2,:)~=0);
         if ~isempty(edges)
-            G=rmedge(G,edges(1,:),edges(2,:));
-            G=addedge(G,edges(1,:),edges(2,:));
+             G=G | sparse(edges(1,:),edges(2,:) ,size(edges,2),size(G,1),size(G,1));
         end
     end
     

@@ -13,10 +13,10 @@ function [ mb ] = markov_blanket(n,m0)
     global G;
     
     mb1 = m0+1;
-    mb2 = neighbors(G,n+1)';
-
-     if isempty(intersect_int(mb1,mb2))
-         mb = shortestpath(G,1,n+1);%%%%%%%%%%%%%%%this shoul not be empty
+       mb2 = find(G(n+1,:));
+    
+    if isempty(intersect_int(mb1,mb2))
+         mb = shortestpath(graph(G,'upper'),1,n+1);%%%%%%%%%%%%%%%this shoul not be empty
          if ~isempty(mb)
              mb2 = union_int( mb2,mb);
          end

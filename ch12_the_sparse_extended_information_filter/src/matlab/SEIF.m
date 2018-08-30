@@ -25,8 +25,7 @@ function SEIF
     Mask13 = uint16(2^13 -1) ;
     
     global G;
-    G=graph(true(0));
-    G=addnode(G,1);
+    G=sparse(1,1);
     
     global  Q;
     Q= diag([5 0.02]);
