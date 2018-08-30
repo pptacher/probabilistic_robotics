@@ -25,7 +25,8 @@ function [] = SEIF_measurement( z, c)
         m1 = zeros(size(xi,1)+2*new,1);
         m1(1:size(xi,1),1) = m;
         m1(size(xi,1)+1:end,1) = reshape(inverse_measurement(m(1:3),z(:,c>n)),[2*new,1]);
-        G=addnode(G,new);
+        s=size(G,1);
+        G(s+new,s+new)=0;
     else
         O1 = O;
         xi1 = xi;
@@ -52,9 +53,8 @@ function [] = SEIF_measurement( z, c)
    O=O1;
     %unneeded in theory
     c = unique(c);
-    %avoids error when adding existing edge
-     G=rmedge(G,ones(1,size(c,2)),c+1);
-     G=addedge(G,ones(1,size(c,2)),c+1);
+    G=G | sparse(ones(1,size(c,2)), c+1,ones(1,size(c,2)),(size(xi,1)-3)/2+1,(size(xi,1)-3)/2+1);
+   
    
 end
 

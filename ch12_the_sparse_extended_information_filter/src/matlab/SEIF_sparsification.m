@@ -15,13 +15,14 @@ function [  ] = SEIF_sparsification( m0,m1,m2)
     global m xi O
     
     global G;
-    G=rmedge(G,ones(1,size(m1,2)),m1+1);
+    sg=size(G,1);
+    mask=ones(sg,sg)-sparse(ones(1,size(m1,2)),m1+1,ones(1,size(m1,2)),sg,sg);
+    G= G & mask;
     [s,t]=meshgrid(union(m1,m0),m1);
     s=s(:)'+1;t=t(:)'+1;
     edges=unique(sort([s;t],1)','rows')';
     edges=edges(:,edges(1,:)-edges(2,:)~=0);
-    G=rmedge(G,edges(1,:),edges(2,:));
-    G=addedge(G,edges(1,:),edges(2,:));
+    G=G | sparse(edges(1,:),edges(2,:) ,size(edges,2),sg,sg);
 
     s0=size(m0,2);s1=size(m1,2);s2=size(m2,2);s=size(m,1);
     m0=sort(m0,2);m1=sort(m1,2);m2=sort(m2,2);
