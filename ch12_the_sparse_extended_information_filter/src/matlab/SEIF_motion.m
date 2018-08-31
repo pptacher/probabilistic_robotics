@@ -28,15 +28,18 @@ function [ ] = SEIF_motion(v, a, t,m0)
     OX=sparse(O(:, 1:3));
     psi1 = OX*psi;
 
-    lambda(:, 1:3) = psi1;lambda(n,n)=0;lambda(1:3,:) = lambda(1:3,:) + psi1';
+    lambda=sparse(n,n);
+    lambda(:, 1:3) = psi1;lambda(1:3,:) = lambda(1:3,:) + psi1';
     lambda(1:3, 1:3)= lambda(1:3, 1:3) + psi'*O(1:3,1:3)*psi;
     
     phi = O + lambda;
-    k = phi(:,1:3)*inv(inv(R)+ phi(1:3,1:3))*phi(1:3, :);
+    phiX=sparse(phi(:,1:3));
+    k = phiX*inv(inv(R)+ phi(1:3,1:3))*phiX';
     O = phi-k;
 
     dx = equation_motion(m(3,1), v, a, t);
-    xi = xi + (lambda-k)*m+O(:,1:3)*dx;
+    OX=sparse(O(:, 1:3));
+    xi = xi + lambda*m-k*m+OX*dx;
     m = m + [dx;zeros(n-3,1)];
     
     clear OX
