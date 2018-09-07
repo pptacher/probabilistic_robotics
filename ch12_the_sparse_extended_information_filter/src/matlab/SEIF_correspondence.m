@@ -56,8 +56,8 @@ function [ c ] = SEIF_correspondence( z,m0)
                    
         end
 
-        F = mat2cell(reshape(bsxfun(@minus,zhat,z),2,k*a,1),2,k*ones(1,a));
-        F = cat(1,F{:});F(2:2:end)=measure(F(2:2:end));
+        F = reshape(permute(bsxfun(@minus,zhat,z),[1,3,2]),2*a,k);
+        F(2:2:end,:)=measure(F(2:2:end,:));
         %first pass over active landmarks        
         N = zeros(2*a,k);
         [C,ia,~] = intersect(lst,m0,'stable');
@@ -103,7 +103,7 @@ end
 
 function alpha = measure(theta)
     tmp =mod(theta,2*pi);
-    %there is a bug in matlab mod 
+    %matlab mod may return 2pi due to precision limitation
     alpha = tmp-min(floor(tmp/pi),1)*2*pi;
 end
 
