@@ -65,7 +65,7 @@ curr=1;
 while ~found && i<j
     curr=q(i);
     i=i+1;
-    next=find(G(curr,:) & d==-1);
+    next=find((G(curr,:)|G(:,curr)') & d==-1);
     s=size(next,2);
     q(j:j+s-1)=next;j=j+s;d(next)=curr*ones(1,s);
     found=d(n)==curr;
