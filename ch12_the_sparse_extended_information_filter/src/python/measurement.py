@@ -1,11 +1,11 @@
 from numpy import *
 import numpy as np
+from scipy.linalg import inv
+from scipy.sparse import csr_matrix,vstack,hstack
+
 from jacobian_measurement import jacobian_measurement
 from equation_measurement import equation_measurement
 from inverse_measurement import inverse_measurement
-from scipy.linalg import inv
-
-from scipy.sparse import csr_matrix,vstack,hstack
 
 from pdb import set_trace as bp
 
@@ -41,16 +41,15 @@ def measurement(z,c,xi,omega,m,G):
 
            dz[1] = measure(dz[1])
            dz = dz.reshape((2,1))
-
            ind = hstack((r_[0:3],[2*j+1,2*j+2])).toarray().ravel()
 
-           xi1[ind] = xi1[ind]+ (h.T.dot(inv(Q)).dot(dz+h.dot(m1[ind].reshape((5,1))))).flatten()
-           omega1[ix_(ind,ind)] = omega1[ix_(ind,ind)]+   h.T.dot(inv(Q)).dot(h)
+           Q1 = inv(Q)
+           xi1[ind] = xi1[ind]+ h.T@Q1@(dz+h@m1[ind].reshape((5,1))).flatten()
+           omega1[ix_(ind,ind)] = omega1[ix_(ind,ind)] + h.T@Q1@h
 
     c = unique(c)
     row = zeros(c.size)
     col = c
-
     data = ones(c.size)
     nl = csr_matrix((data,(row,col)),shape=(G.shape[0],G.shape[0]),dtype=bool)
     G = G + nl + nl.T

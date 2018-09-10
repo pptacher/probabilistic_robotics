@@ -8,6 +8,7 @@ from jacobian_measurement import jacobian_measurement
 from markov_blanket import markov_blanket
 
 from pdb import set_trace as bp
+
 #@profile
 def correspondence(z,m0,omega,m,G):
 
@@ -35,9 +36,7 @@ def correspondence(z,m0,omega,m,G):
 
         for i in range(0,a):
                 ind = markov_blanket(lst[i]+1,m0,G)
-
                 ind = ind[1:]-1
-
                 c1 = 3+2*ind
                 ind = vstack((c1,c1+1)).flatten(order='F')
                 ind1 = nonzero(ind==3+2*lst[i])[0][0]
@@ -46,12 +45,7 @@ def correspondence(z,m0,omega,m,G):
                 ind3 = np.hstack((r_[0:3],array([3+ind1,4+ind1])))
 
                 s = la.solve(omega[ix_(ind2,ind2)],f.T@J[:,:,i].T)
-                #s = la.inv(omega[ix_(ind2,ind2)])
-                #s = J[:,:,i]@s[ix_(ind3,ind3)]@J[:,:,i].T
-                #d,u = la.eigh(s+Q)
-                #ugly
                 d,u = la.eigh(J[:,:,i]@s[ind3,:]+Q)
-                #bp()
                 u = diag(sqrt(1/d)).dot(u.T)
                 aa[2*i:2*i+2,:] = u
 
@@ -106,24 +100,10 @@ def correspondence(z,m0,omega,m,G):
 
     if new1.size>0:
             new = new[setdiff1d(r_[0:new.size],new1)]
-
     if new.size>0:
             co[new] = n+ r_[1:new.size+1]
 
     return co
-
-#inefficient
-def fxm(p,n):
-    if p>=0:
-            row = r_[0:5]
-            columns = np.hstack((r_[0:3],array([3+p,4+p])))
-            data = ones(5)
-            return csr_matrix((data,(row,columns)),shape=(5,n))
-    else:
-            row = r_[0:3]
-            columns = r_[0:3]
-            data = ones(3)
-            return csr_matrix((data,(row,columns)),shape=(3,n))
 
 def fxmd(p,n):
         if p>=0:

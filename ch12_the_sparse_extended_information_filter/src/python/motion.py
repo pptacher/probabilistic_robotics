@@ -11,7 +11,6 @@ from pdb import set_trace as bp
 def motion(v,a,dt,m0,xi,omega,m,G):
     n = xi.size
     R = diag([8e-4,8e-4,1e-6])
-
     J = jacobian_motion(m[2],v,a,dt)
 
     psi = inv(J)-eye(3)
