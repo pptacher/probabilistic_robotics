@@ -1,5 +1,4 @@
 from numpy import *
-
 from scipy.sparse import csr_matrix
 from scipy.linalg import solve
 
@@ -19,8 +18,6 @@ def sparsification(m0,m1,xi,omega,m,G):
     edges = edges[:,edges[0,:]-edges[1,:]!=0]
     nl = csr_matrix((ones(edges.shape[1]),(edges[0,:],edges[1,:])),shape=(sg,sg),dtype=bool)
     G = G + nl + nl.T
-
-
 
     m0 = sort(m0)
     m1 = sort(m1)

@@ -85,7 +85,7 @@ def seif():
         m = estimate(m0,xi,omega,m)
 
         while j<L and timeLsr[j]<time[i]+dt*1000:
-           #squeeze(x, axis=2) needs version >= 1.7
+           
            z1=z[0:2,nonzero(z[0,:,j]),j].transpose((0,2,1))[:,:,0]
            if z1.size >0:
                co = correspondence(z1,m0,omega,m,G)
@@ -101,7 +101,6 @@ def seif():
                m1 = setdiff1d(m0,tq)
                m1 = union1d(m1,setdiff1d(co,tq))
                m0 = tq
-
                if m1.size>0:
                    xi,omega,G = sparsification(m0,m1,xi,omega,m,G)
 
@@ -127,9 +126,9 @@ def seif():
 
 if __name__ == "__main__":
     # execute only if run as a script
-    #import cProfile
-    #pr = cProfile.Profile()
-    #pr.enable()
+    import cProfile
+    pr = cProfile.Profile()
+    pr.enable()
     seif()
-    #pr.disable()
-    #pr.print_stats(sort='cumtime')
+    pr.disable()
+    pr.print_stats(sort='cumtime')
