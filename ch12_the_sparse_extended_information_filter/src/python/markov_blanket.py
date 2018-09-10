@@ -21,14 +21,14 @@ def union_int(m1,m2,s):
     y = zeros(s)
     x[m1] = 1
     y[m2] = 1
-    return nonzero(logical_or(x,y))[0]
+    return nonzero(x+y)[0]
 
 def intersect_int(m1,m2,s):
     x = zeros(s)
     y = zeros(s)
     x[m1] = 1
     y[m2] = 1
-    return nonzero(logical_and(x,y))[0]
+    return nonzero(x*y)[0]
 
 def bfs(n,G):
     s = G.shape[0]
