@@ -1,5 +1,5 @@
 using Distributed
-const N_CORES = 4
+const N_CORES = 7
 rmprocs(workers())
 addprocs(N_CORES)
 @everywhere push!(LOAD_PATH,".")
