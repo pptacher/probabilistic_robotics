@@ -110,6 +110,7 @@ end
             ind1 = findfirst(ind.==2*lst[i]+2)
             f = fxm(ind1,3+length(ind))
             j = jcb[:,:,i]
+            #drastic improvements with symmetric matrices specific solver.
             s = j*f / Symmetric(Ω[[1:3;ind],[1:3;ind]]) *f'*j'
             vals,vec = eigen(Symmetric(s+qnoise))
             q[2i-1:2i,:] = diagm( 0 => sqrt.(1 ./ vals) )*vec'
