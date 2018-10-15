@@ -14,7 +14,6 @@ function measurement(z,c,μ,ξ,Ω,graph)
         padd = spzeros(Bool,nnew,n+1)
         padd1 = spzeros(Bool,n+nnew+1,nnew)
         graph = [[graph;padd] padd1]
-
     end
 
     jcb = jacobian_measurement(μ,c)

@@ -71,7 +71,6 @@ function correspondence(z,m₀,μ,Ω,graph)
                         co₁ = co₁[:]
                         co[newl] = lst[getindex.(co₁,1)]
                         m₁ = minimum(d₃,dims=1)[:]
-
                         new₁ = []
                         newl = newl[m₁ .> c₂]
                 end
@@ -106,14 +105,14 @@ end
         @inbounds for i ∈ irange
             ind = markov_blanket(lst[i]+1,m₀.+1,graph)
             ind = ind[2:end] .- 1
-            ind = [[2*j+2,2*j+3] for j ∈ ind ]
+            ind = [[2j+2,2j+3] for j ∈ ind ]
             ind = vcat(ind...)
             ind1 = findfirst(ind.==2*lst[i]+2)
             f = fxm(ind1,3+length(ind))
-            s = jcb[:,:,i]*f / Ω[[1:3;ind],[1:3;ind]]
-            vals,vec = eigen(s*f'*jcb[:,:,i]'+qnoise)
-            u = diagm( 0 => sqrt.(1 ./ vals) )*vec'
-            q[2*i-1:2*i,:] = u
+            j = jcb[:,:,i]
+            s = j*f / Ω[[1:3;ind],[1:3;ind]] *f'*j'
+            vals,vec = eigen(s+qnoise)
+            q[2i-1:2i,:] = diagm( 0 => sqrt.(1 ./ vals) )*vec'
         end
 end
 

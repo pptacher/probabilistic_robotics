@@ -64,7 +64,7 @@ function seif()
         if i > stindex && i%5000==0
             plot!(poses[1,:],poses[2,:],line = (:black, 1, 0.2))
             scatter!(μ[4:2:end],μ[5:2:end],
-            markersize = 1.5 )
+            markersize = 1 )
             Plots.gui()
             h5open(include_dir * "iter_$i.h5", "w") do file
                 write(file, "/poses", poses)
