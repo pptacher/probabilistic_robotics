@@ -74,12 +74,11 @@ std::vector<uint> correspondence(mat& z, std::vector<uint>& m0, vec& μ, vec& ξ
                     Ωii_mem,1+2*indx.n_elem,
                     jf_mem,ind.size());
       if (info > 0) {
-        //std::cout << "err!!!!!!!!!!!!!" << '\n';
         exit(1);
       }
 
-      mat sol(jf_mem,1+2*indx.n_elem,2,false,true);
-      mat s(j*f*sol+qnoise);
+      //mat sol(jf_mem,1+2*indx.n_elem,2,false,true);
+      mat s(j*f*jf+qnoise);
 
       vec eigval;
       mat eigvec;
