@@ -54,7 +54,7 @@ CXX_DEFINES = -DSHADERS_DIR=\"/Users/TACHER/sparklepp/src/shaders\" -DUSE_GLEW
 #CXXFLAGS := -std=c++14 -Weffc++ $(COMPILER_OPTIONS) $(INCLUDE_PATH)
 
 DEBUGFLAGS := -g -O0 -D _DEBUG
-RELEASEFLAGS := -O2 -D NDEBUG
+RELEASEFLAGS := -O3 -D NDEBUG
 ##########################################################
 
 # Fabrication des .o (lib)
