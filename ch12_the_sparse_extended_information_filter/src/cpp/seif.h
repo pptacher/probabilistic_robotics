@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <iterator>
 #include <queue>
+#include "mkl_lapacke.h"
 //#include "mkl.h"
 
 /////////////////////////////////////////////////////////////////////
