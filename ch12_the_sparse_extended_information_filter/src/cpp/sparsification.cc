@@ -100,8 +100,9 @@ void sparsification(std::vector<uint>& m0, std::vector<uint>& m6, vec& μ, vec& 
     join_vert(join_vert(uvec({0,1,2}),indx0),indx6)) += l2;
   Ω -= l3;
 
-  //Ω(uvec({0,1,2}),indx6).zeros();
-  //Ω(indx6,uvec({0,1,2})).zeros();
+  //correct rounding errors.
+  Ω(uvec({0,1,2}),indx6).zeros();
+  Ω(indx6,uvec({0,1,2})).zeros();
 
   ξ += (Ω-Ω₄)*μ;
 }
