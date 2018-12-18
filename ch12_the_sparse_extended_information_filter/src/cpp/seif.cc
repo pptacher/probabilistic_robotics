@@ -47,6 +47,9 @@ void seif(){
 
   mat::fixed<5000,2> poses = zeros<mat>(5000,2);
 
+  //uint max_threads = mkl_get_max_threads();
+  //mkl_set_num_threads(max_threads);
+
   std::chrono::steady_clock::time_point time_;
   std::chrono::steady_clock::time_point start_time_;
   std::chrono::steady_clock::time_point start_iter_;

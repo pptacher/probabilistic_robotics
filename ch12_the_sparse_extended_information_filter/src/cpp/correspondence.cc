@@ -55,7 +55,12 @@ std::vector<uint> correspondence(mat& z, std::vector<uint>& m0, vec& μ, vec& ξ
       SpMat<double> f = f_xm(ind1(0),ind.size());
 
       mat j = jcb.slice(i);
+      superlu_opts opts;
 
+      //opts.allow_ugly  = true;
+      //opts.symmetric = true;
+      //opts.refine = superlu_opts::REF_NONE;
+      //mat s(j*f*spsolve(sp_mat(symmatu(Ω(ind,ind))),f.t()*j.t(),"superlu",opts)+qnoise);
       mat s(j*f*solve(symmatu(Ω(ind,ind)),f.t()*j.t(),solve_opts::fast)+qnoise);
 
       vec eigval;

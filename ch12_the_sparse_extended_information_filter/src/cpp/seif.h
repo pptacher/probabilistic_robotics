@@ -1,6 +1,7 @@
 #define ARMA_USE_HDF5
 //#define ARMA_USE_SUPERLU 1
 #define ARMA_64BIT_WORD
+#define DARMA_DONT_USE_WRAPPER
 
 #include <iostream>
 #include <armadillo>
@@ -12,6 +13,7 @@
 #include <algorithm>
 #include <iterator>
 #include <queue>
+//#include "mkl.h"
 
 /////////////////////////////////////////////////////////////////////
 //gdb helpers
