@@ -10,10 +10,6 @@ void seif(){
   std::string filename5 = include_dir + "poses.dat";
   std::ofstream ostrm(filename5, std::ios::binary);
 
-  std::string filename6 = include_dir + "corresp.dat";
-  std::ofstream ostrm1(filename6, std::ios::binary);
-
-  float dt = 25e-3;
   arma::mat speed, steering, time,  measurmt;
   uvec timelsr;
   speed.load(arma::hdf5_name(include_dir + filename2, "speed"));
@@ -22,16 +18,6 @@ void seif(){
   timelsr.load(include_dir + filename4);
   measurmt.load(arma::hdf5_name(include_dir + filename3, "zz"));
 
-  /*mat B(speed.memptr(),61945,1,false);
-  speed(0) = 100000;
-
-  std::cout << size(steering) << std::endl;
-  std::cout << size(speed) << std::endl;
-  std::cout << size(measurement) << std::endl;
-  std::cout << steering(span(0,10),0) << std::endl;
-  std::cout << speed(span(0,10),0) << std::endl;
-  std::cout << B(span(0,10),0) << std::endl;*/
-
   vec μ = zeros<vec>(3);
   vec ξ = zeros<vec>(3);
   mat Ω = 10e4*eye<mat>(3,3);
@@ -39,13 +25,14 @@ void seif(){
   SpMat<ushort> Λ;
 
   static uint const n(20);
+  static float const dt = 25e-3;
 
   uint stindex = 0;
   uvec jvec = find(timelsr >= time(stindex),1,"first");
   uint llsr = timelsr.n_elem;
   uint j = jvec(0);
 
-  mat::fixed<5000,2> poses = zeros<mat>(5000,2);
+  //mat::fixed<5000,2> poses = zeros<mat>(5000,2);
 
   //uint max_threads = mkl_get_max_threads();
   //mkl_set_num_threads(max_threads);
@@ -70,13 +57,13 @@ void seif(){
       Col<uint>(m0).save(hdf5_name(filename, "m0"));
       Λ.save(include_dir + "Λ_iter_" + std::to_string(i) + ".bin");*/
 
-      std::string filename = include_dir + "iter_" + std::to_string(i) + ".dat";
+      /*std::string filename = include_dir + "iter_" + std::to_string(i) + ".dat";
       poses.save(include_dir + "poses_" + std::to_string(i) + ".dat");
       μ.save(include_dir + "μ_" + std::to_string(i) + ".dat");
       ξ.save(include_dir + "ξ_" + std::to_string(i) + ".dat");
       Ω.save(include_dir + "Ω_" + std::to_string(i) + ".dat");
       Col<uint>(m0).save(include_dir + "m0_" + std::to_string(i) + ".dat");
-      Λ.save(include_dir + "Λ_" + std::to_string(i) + ".dat");
+      Λ.save(include_dir + "Λ_" + std::to_string(i) + ".dat");*/
     }
 
     motion(speed(i),steering(i),dt,m0,μ,ξ,Ω,Λ);
@@ -128,7 +115,6 @@ void seif(){
         sparsification(m0,m6,μ,ξ,Ω,Λ);
       }
     }
-
 
     time_ = std::chrono::steady_clock::now();
     deltatime_ = std::chrono::duration_cast<std::chrono::duration<float>>(time_-start_time_).count();
