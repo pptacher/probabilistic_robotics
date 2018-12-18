@@ -63,24 +63,23 @@ std::vector<uint> correspondence(mat& z, std::vector<uint>& m0, vec& μ, vec& ξ
       //mat s(j*f*spsolve(sp_mat(symmatu(Ω(ind,ind))),f.t()*j.t(),"superlu",opts)+qnoise);
       //mat s(j*f*solve(symmatu(Ω(ind,ind)),f.t()*j.t(),solve_opts::fast)+qnoise);
 
-      mat Ωii(Ω(ind,ind));
+      mat Ωii(trimatu(Ω(ind,ind)));
       mat jf(f.t()*j.t());
 
       double *Ωii_mem = Ωii.memptr();
       double *jf_mem = jf.memptr();
 
-      //calling directly LAPACK function.
       MKL_INT info;
       info = LAPACKE_dposv(LAPACK_COL_MAJOR,'U',1+2*indx.n_elem,2,
                     Ωii_mem,1+2*indx.n_elem,
                     jf_mem,ind.size());
       if (info > 0) {
-        std::cout << "err!!!!!!!!!!!!!" << '\n';
+        //std::cout << "err!!!!!!!!!!!!!" << '\n';
         exit(1);
       }
 
       mat sol(jf_mem,1+2*indx.n_elem,2,false,true);
-      mat s(jf.t()*sol+qnoise);
+      mat s(j*f*sol+qnoise);
 
       vec eigval;
       mat eigvec;
