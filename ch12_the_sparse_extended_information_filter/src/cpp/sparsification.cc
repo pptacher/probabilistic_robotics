@@ -36,14 +36,14 @@ void sparsification(std::vector<uint>& m0, std::vector<uint>& m6, vec& μ, vec& 
 
   mat Ω₁ = Ω(join_vert(join_vert(uvec({0,1,2}),indx0),indx6),
               indx6);
-  mat l1 = Ω₁*solve(Ω(indx6,indx6),Ω₁.t());
+  mat l1 = Ω₁*solve(symmatu(Ω(indx6,indx6)),Ω₁.t(),solve_opts::fast);
 
   mat Ω₂ = Ω(join_vert(join_vert(uvec({0,1,2}),indx0),indx6),
               join_vert(uvec({0,1,2}),indx6));
-  mat l2  = Ω₂ * solve(Ω(join_vert(uvec({0,1,2}),indx6),join_vert(uvec({0,1,2}),indx6)),Ω₂.t());
+  mat l2  = Ω₂ * solve(symmatu(Ω(join_vert(uvec({0,1,2}),indx6),join_vert(uvec({0,1,2}),indx6))),Ω₂.t(),solve_opts::fast);
 
   mat Ω₃ = Ω(span::all,span(0,2));
-  mat l3 =Ω₃ * solve(Ω(span(0,2),span(0,2)),Ω₃.t());
+  mat l3 =Ω₃ * solve(symmatu(Ω(span(0,2),span(0,2))),Ω₃.t(),solve_opts::fast);
 
   mat Ω₄(Ω);
   Ω(join_vert(join_vert(uvec({0,1,2}),indx0),indx6),
@@ -51,6 +51,9 @@ void sparsification(std::vector<uint>& m0, std::vector<uint>& m6, vec& μ, vec& 
   Ω(join_vert(join_vert(uvec({0,1,2}),indx0),indx6),
     join_vert(join_vert(uvec({0,1,2}),indx0),indx6)) += l2;
   Ω -= l3;
+
+  Ω(uvec({0,1,2}),indx6).zeros();
+  Ω(indx6,uvec({0,1,2})).zeros();
 
   ξ += (Ω-Ω₄)*μ;
 }
