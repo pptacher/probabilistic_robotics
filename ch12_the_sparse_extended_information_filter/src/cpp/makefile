@@ -1,51 +1,51 @@
 help:
 	@echo
-	@echo "make lib      <-- Compile la lib."
-	@echo "make build    <-- Compile tout."
-	@echo "make clean    <-- Fais le m�nage."
-	@echo "make install  <-- Compile et installe"
-	@echo "make dist     <-- Fais un .tar.gz du projet"
+	@echo "make lib      <-- Compile lib."
+	@echo "make build    <-- Compile all."
+	@echo "make clean    <-- Clean up."
+	@echo "make install  <-- Compile and install"
+	@echo "make dist     <-- Create .tar.gz project file"
 	@echo
 
-PROJECT_NAME = dgemm
+PROJECT_NAME = seif
 VERSION      = 001
 
 ARCHIVE_DIR_NAME = $(PROJECT_NAME)-$(VERSION)
 ARCHIVE_NAME     = $(ARCHIVE_DIR_NAME).tar.gz
 
-FILES_TO_BE_ARCHIVED = *.hpp *.cpp Makefile
+FILES_TO_BE_ARCHIVED = *.h *.cc Makefile
 
 INCLUDE_PATH = -I. -I/opt/intel/compilers_and_libraries/linux/mkl/include/
-
-#doesn't support -std=c++14 when using "g++"
+#problem with linking using gcc
 COMPILO     =  g++
-CXXFLAGS      =  -Wall   $(INCLUDE_PATH) -Wno-deprecated-declarations
-CXXFLAGS_COOK  = $(CXXFLAGS) -fPIC -shared
-LIBS        = -L. -ldgemm
+CXXFLAGS      =  $(RELEASEFLAGS) -m64 -Wall -Wextra -Wshadow -Werror -pedantic   $(INCLUDE_PATH) -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused
+CXXFLAGS_SHARED  = $(CXXFLAGS) -fPIC -shared
+LIBS        = -L. -L/usr/lib/x86_64-linux-gnu/ -lseif -larmadillo -lhdf5_cpp
 
 INSTALL_PREFIX      = ./LocalInstall
 
 INSTALL_BIN_DIR     = $(INSTALL_PREFIX)/bin
 INSTALL_LIB_DIR     = $(INSTALL_PREFIX)/lib
-INSTALL_INCLUDE_DIR = $(INSTALL_PREFIX)/include/dgemm
+INSTALL_INCLUDE_DIR = $(INSTALL_PREFIX)/include/seif
 
 INSTALL_DIRS =					\
 	$(INSTALL_BIN_DIR)			\
 	$(INSTALL_LIB_DIR)			\
 	$(INSTALL_INCLUDE_DIR)
 
-# Pour l'instant, aucun .hpp n'est mis dans les d�pendances.... on
-# devrait, mais c'est difficile (car les .hpp peuvent s'inclure les
-# uns les autres).
-########################################################
+##########################################################
+#patch for gcc: pre process to convert UTF-8 encoding to Unicode code point.
+#ref: https://gcc.gnu.org/wiki/FAQ#What_is_the_status_of_adding_the_UTF-8_support_for_identifier_names_in_GCC.3F
+PROCESS_UTF8 = ./to_UCN.sh
+
 #SHELL := /bin/sh
 #CC := g++
 #CXX := g++
 
 export LIBRARY_PATH=/opt/intel/compilers_and_libraries/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries/linux/lib/intel64
-export MKL_VERBOSE=1
+#export MKL_VERBOSE=1
 
-COMPILER_OPTIONS := -m64 -Wall -Wextra -Wshadow -Werror -pedantic -Iinclude     -fdiagnostics-color=auto -lsqlite3 -fno-builtin-qsort -lglfw -lglfw3 -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -Wno-deprecated-declarations
+COMPILER_OPTIONS := -m64 -Wall -Wextra -Wshadow -Werror -pedantic -Iinclude -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated-declarations
 #INCLUDE_PATH = -I.
 
 CXX_DEFINES = -DSHADERS_DIR=\"/Users/TACHER/sparklepp/src/shaders\" -DUSE_GLEW
@@ -59,63 +59,61 @@ RELEASEFLAGS := -O2 -D NDEBUG
 
 # Fabrication des .o (lib)
 
-app.o :	app.cc
-			$(COMPILO)  -c -std=c++14  $(CXXFLAGS_COOK) app.cc
+seif.o : seif.cc
+			$(PROCESS_UTF8) seif.cc
+			$(COMPILO)  -c -std=c++14  $(CXXFLAGS_SHARED) /tmp/seif.cc
+
+motion.o : motion.cc
+			$(PROCESS_UTF8) motion.cc
+			$(COMPILO)  -c -std=c++14  $(CXXFLAGS_SHARED) /tmp/motion.cc
+
+estimate.o : estimate.cc
+				$(PROCESS_UTF8) estimate.cc
+				$(COMPILO)  -c -std=c++14  $(CXXFLAGS_SHARED) /tmp/estimate.cc
+
+correspondence.o : correspondence.cc
+				$(PROCESS_UTF8) correspondence.cc
+				$(COMPILO)  -c -std=c++14  $(CXXFLAGS_SHARED) /tmp/correspondence.cc
+
+markov_blanket.o : markov_blanket.cc
+				$(PROCESS_UTF8) markov_blanket.cc
+				$(COMPILO)  -c -std=c++14  $(CXXFLAGS_SHARED) /tmp/markov_blanket.cc
+
+measurement.o : measurement.cc
+				$(PROCESS_UTF8) measurement.cc
+				$(COMPILO)  -c -std=c++14  $(CXXFLAGS_SHARED) /tmp/measurement.cc
+
+sparsification.o : sparsification.cc
+				$(PROCESS_UTF8) sparsification.cc
+				$(COMPILO)  -c -std=c++14  $(CXXFLAGS_SHARED) /tmp/sparsification.cc
+
+linear_model.o : linear_model.cc
+				$(PROCESS_UTF8) linear_model.cc
+				$(COMPILO)  -c -std=c++14  $(CXXFLAGS_SHARED) /tmp/linear_model.cc
 
 # Fabrication des .o (hors lib)
 
 main.o : main.cc
 			$(COMPILO) -c -std=c++14 $(CXXFLAGS) main.cc
 
-main1.o : main1.cc
-			./to_UCN.sh main1.cc
-			$(COMPILO) -c -std=c++14 $(CXXFLAGS) /tmp/main1.cc
-
-main0.o : main0.cc
-			$(COMPILO) -c -std=c++14 $(CXXFLAGS) main0.cc
-
-main10.o : main10.cc
-				$(COMPILO) -c -std=c++14 $(CXXFLAGS) main10.cc
-
-example1.o : example1.cc
-				$(COMPILO) -c -std=c++14 $(CXXFLAGS) example1.cc
-
 # Fabrication de la lib
 
-libsparkle.so : app.o events.o opengl.o scene.o append_consume_buffer.o gpu_particle.o random_buffer.o vector_field.o noise.o
-	$(COMPILO) -o libsparkle.so -shared -lglfw3  -lFreetype -lGlew -framework Cocoa -framework OpenGL -framework Glut -framework IOKit -framework CoreVideo  app.o events.o opengl.o scene.o append_consume_buffer.o gpu_particle.o random_buffer.o vector_field.o noise.o
+libseif.so : seif.o motion.o estimate.o correspondence.o measurement.o sparsification.o linear_model.o markov_blanket.o
+	$(COMPILO) -o libseif.so -shared -larmadillo seif.o motion.o estimate.o correspondence.o measurement.o sparsification.o linear_model.o markov_blanket.o
 
-# Fabrication de l'ex�cutable
+# Fabrication de l'exécutable
 
-test2.bin : main.o libsparkle.so
-	$(COMPILO) -o   test1.bin main.o  -lsoil -lglfw -lglfw3  -lGlew -framework Cocoa -framework OpenGL -framework Glut -framework IOKit -framework CoreVideo $(LIBS)
-
-test.bin : main.o
-		$(COMPILO) -o   test.bin main.o  -larmadillo -L/opt/intel/compilers_and_libraries/linux/mkl/lib/intel64_lin -lmkl_intel_ilp64  -lmkl_core -lmkl_def -lmkl_sequential
-
-test1.bin : main1.o
-		$(COMPILO) -o   test1.bin main1.o   -lmkl_intel_ilp64  -lmkl_core -lmkl_def -lmkl_intel_thread -lpthread -ldl -lm -liomp5
-
-test10.bin : main10.o
-		$(COMPILO) -o   test10.bin main10.o   -lmkl_intel_ilp64  -lmkl_core -lmkl_def -lmkl_intel_thread -lpthread -ldl -lm -liomp5 -larmadillo
-
-example1.bin : example1.o
-				$(COMPILO) -o   example1.bin example1.o   -lmkl_intel_ilp64  -lmkl_core -lmkl_def -lmkl_intel_thread -lpthread -ldl -lm -liomp5 -larmadillo
-
-test0.bin : main0.o
-		$(COMPILO) -o   test0.bin main0.o -larmadillo
-
-#-DARMA_DONT_USE_WRAPPER -lmkl_intel_ilp64  -lmkl_core -lmkl_def -lmkl_intel_thread -lpthread -ldl -lm -liomp5
-
+seif.bin : main.o libseif.so
+		$(COMPILO) -o   seif.bin main.o  $(LIBS) -lpthread -lmkl_core -lmkl_def -lmkl_intel_thread -lmkl_core -liomp5 -lm -ldl
+#-DARMA_DONT_USE_WRAPPER -lmkl_intel_thread -lmkl_intel_ilp64
 phony :
 	echo $(LIBRARY_PATH)
-	@(echo $(MKL_VERBOSE))
 
 # Les cibles de l'aide
 
-lib : libsparkle.so
+lib : libseif.so
 
-build : test.bin
+build : seif.bin
 
 clean :
 	@rm -f *~ *.o *.so *.bin
@@ -123,11 +121,11 @@ clean :
 	@echo
 	@echo "Cleaned up."
 
-install : test.bin libcook.so
+install : seif.bin libseif.so
 	@mkdir -p $(INSTALL_DIRS)
-	@cp test.bin  $(INSTALL_BIN_DIR)
-	@cp libcook.so $(INSTALL_LIB_DIR)
-	@cp cook*.hpp  $(INSTALL_INCLUDE_DIR)
+	@cp seif.bin  $(INSTALL_BIN_DIR)
+	@cp libseif.so $(INSTALL_LIB_DIR)
+	@cp *.h  $(INSTALL_INCLUDE_DIR)
 	@echo "File installed in " $(INSTALL_BIN_DIR) $(INSTALL_LIB_DIR) $(INSTALL_INCLUDE_DIR)
 
 dist :
