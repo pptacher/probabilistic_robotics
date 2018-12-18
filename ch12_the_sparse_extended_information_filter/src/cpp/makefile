@@ -16,7 +16,7 @@ ARCHIVE_NAME     = $(ARCHIVE_DIR_NAME).tar.gz
 FILES_TO_BE_ARCHIVED = *.h *.cc Makefile
 
 INCLUDE_PATH = -I. -I/opt/intel/compilers_and_libraries/linux/mkl/include/
-#problem with linking using gcc
+
 COMPILO     =  g++
 CXXFLAGS      =  $(RELEASEFLAGS) -m64 -Wall -Wextra -Wshadow -Werror -pedantic   $(INCLUDE_PATH) -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused
 CXXFLAGS_SHARED  = $(CXXFLAGS) -fPIC -shared
@@ -38,20 +38,12 @@ INSTALL_DIRS =					\
 #ref: https://gcc.gnu.org/wiki/FAQ#What_is_the_status_of_adding_the_UTF-8_support_for_identifier_names_in_GCC.3F
 PROCESS_UTF8 = ./to_UCN.sh
 
-#SHELL := /bin/sh
-#CC := g++
-#CXX := g++
-
 export LIBRARY_PATH=/opt/intel/compilers_and_libraries/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries/linux/lib/intel64
 #export MKL_VERBOSE=1
 
 COMPILER_OPTIONS := -m64 -Wall -Wextra -Wshadow -Werror -pedantic -Iinclude -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated-declarations
-#INCLUDE_PATH = -I.
 
 CXX_DEFINES = -DSHADERS_DIR=\"/Users/TACHER/sparklepp/src/shaders\" -DUSE_GLEW
-
-#CFLAGS := -std=c11 $(COMPILER_OPTIONS)
-#CXXFLAGS := -std=c++14 -Weffc++ $(COMPILER_OPTIONS) $(INCLUDE_PATH)
 
 DEBUGFLAGS := -g -O0 -D _DEBUG
 RELEASEFLAGS := -O2 -D NDEBUG
