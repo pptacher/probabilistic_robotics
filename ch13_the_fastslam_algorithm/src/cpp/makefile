@@ -20,7 +20,7 @@ INCLUDE_PATH = -I. -I/opt/intel/compilers_and_libraries/linux/mkl/include/  -I/u
 COMPILO     =  g++
 CXXFLAGS      =  $(RELEASEFLAGS) -m64 -Wall -Wextra -Wshadow -Werror -pedantic   $(INCLUDE_PATH) -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused
 CXXFLAGS_SHARED  = $(CXXFLAGS) -fPIC -shared
-LIBS        = -L. -L/usr/lib/x86_64-linux-gnu/ -L/usr/local/hdf5/lib/ -lfslam -larmadillo -lhdf5_cpp
+LIBS        = -L. -L/usr/local/hdf5/lib/ -lfslam -larmadillo -lhdf5_cpp
 
 INSTALL_PREFIX      = ./LocalInstall
 
@@ -42,8 +42,12 @@ PROCESS_UTF8 = ./to_UCN.sh
 #CC := g++
 #CXX := g++
 
+#memos
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/intel/compilers_and_libraries/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries/linux/lib/intel64:/usr/local/lib64:/usr/local/lib:.
 export LIBRARY_PATH=/opt/intel/compilers_and_libraries/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries/linux/lib/intel64
 #export MKL_VERBOSE=1
+#gnuplot
+#plot "poses.dat" using 91:92 pt 7 ps 0.1 lc rgb "black", "ldmarks.dat" using 1:2 pt 7 ps 0.6 lc rgb "green"
 
 COMPILER_OPTIONS := -m64 -Wall -Wextra -Wshadow -Werror -pedantic -Iinclude -Wno-unused-parameter -Wno-unused-variable -Wno-deprecated-declarations
 #INCLUDE_PATH = -I.
@@ -56,7 +60,6 @@ COMPILER_OPTIONS := -m64 -Wall -Wextra -Wshadow -Werror -pedantic -Iinclude -Wno
 DEBUGFLAGS := -g -O0 -D _DEBUG
 RELEASEFLAGS := -O2 -D NDEBUG
 ##########################################################
-
 
 # Fabrication des .o (lib)
 

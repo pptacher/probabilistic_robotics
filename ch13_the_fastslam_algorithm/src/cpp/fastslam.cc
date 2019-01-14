@@ -1,7 +1,7 @@
 #include <iomanip>
 #include "particle.h"
 
-void fastslam(){
+void fastslam(uint n){
   std::string filename1 = "aa3_lsr2.h5";
   std::string filename2 = "aa3_dr.h5";
   std::string filename3 = "measurement.h5";
@@ -10,6 +10,9 @@ void fastslam(){
 
   std::string filename5 = include_dir + "poses.dat";
   std::ofstream ostrm(filename5, std::ios::binary);
+
+  std::string filename6 = include_dir + "ldmarks.dat";
+  std::ofstream ostrm1(filename6, std::ios::binary);
 
   arma::mat speed, steering, time,  measurmt;
   uvec timelsr;
@@ -21,7 +24,6 @@ void fastslam(){
 
 
   static float const dt = 25e-3;
-  static uint const n = 100;
   Particle particles(n);
 
   uint stindex = 0;
@@ -51,8 +53,6 @@ void fastslam(){
 
     particles.motion(speed(i),steering(i),dt,z);
 
-    particles.resample();
-
     time_ = std::chrono::steady_clock::now();
     deltatime_ = std::chrono::duration_cast<std::chrono::duration<float>>(time_-start_time_).count();
     deltatime_iter_ = std::chrono::duration_cast<std::chrono::duration<float>>(time_-start_iter_).count();
@@ -61,11 +61,17 @@ void fastslam(){
           << std::setw(15) << "avg: " << std::setw(10) << deltatime_/(i+1) <<
           '\r' ;
 
-    //ostrm  << std::setw(15)  << μ(0) <<
-    //          std::setw(15)  << μ(1) << '\n';
-
     ostrm << particles << '\n';
 
+    if (i%1000==0) {
+      ostrm1.seekp(0,std::ios::beg);
+      particles.print_tree(ostrm1);
+    }
+
   }
+    ostrm1.seekp(0,std::ios::beg);
+    particles.print_tree(ostrm1);
+
+
   std::cout << '\n';
 }

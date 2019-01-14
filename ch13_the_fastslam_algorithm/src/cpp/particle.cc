@@ -12,7 +12,6 @@ void motion_dist(BTree*,mat&,mat&,
                           vec&, mat&,const mat&,
                           const mat&,uint,uint,const uint);
 
-
 /*void BTree::initialize(vec μ, mat Σ){
   if (root) {
     root.reset();
@@ -25,12 +24,27 @@ void motion_dist(BTree*,mat&,mat&,
   }
 }*/
 
-bool BTree::add_node(uint n,vec μ,mat Σ){
+bool BTree::add_node(vec μ, mat Σ) {
+  uint n;
+  if (!avail.empty()) {
+    n = avail.front();
+    avail.pop();
+  }
+  else {
+    n = size;
+  }
+  return add_node(n,μ,Σ);
+}
 
+bool BTree::add_node(uint n,vec μ,mat Σ){
   //std::cout << "adding : " << n << '\n';
   if (root == nullptr) {
     root = std::move(build_tree(0,n,μ,Σ));
     ++size;
+    /*if (pcounts.size() <= n) {
+      pcounts.resize(2*pcounts.size()+1,0);
+    }
+    pcounts[n]=0;*/
     return true;
   }
 
@@ -40,6 +54,11 @@ bool BTree::add_node(uint n,vec μ,mat Σ){
                                   std::move(build_tree(height,n,μ,Σ)));
     ++height;
     ++size;
+    //pcounts[n] = 0;
+    /*if (pcounts.size() <= n) {
+      pcounts.resize(2*pcounts.size()+1,0);
+    }
+    pcounts[n]=0;*/
     return true;
   }
 
@@ -59,6 +78,10 @@ bool BTree::add_node(uint n,vec μ,mat Σ){
       q->set_next(static_cast<direction>(m&1),std::move(build_tree(msb-i,n,μ,Σ)));
       root = cpy;
       ++size;
+      /*if (pcounts.size() <= n) {
+        pcounts.resize(2*pcounts.size()+1,0);
+      }
+      pcounts[n]=0;*/
       return true;
     }
 
@@ -67,7 +90,6 @@ bool BTree::add_node(uint n,vec μ,mat Σ){
                                   p->next_s(left),
                                   p->next_s(right)));
     q = q->next(static_cast<direction>(m&1));
-
     m = n >> (msb-i-1);
   }
 
@@ -75,6 +97,10 @@ bool BTree::add_node(uint n,vec μ,mat Σ){
     q->set_next(static_cast<direction>(m&1),std::move(build_tree(0,n,μ,Σ)));
     root = cpy;
     ++size;
+    /*if (pcounts.size() <= n) {
+      pcounts.resize(2*pcounts.size()+1,0);
+    }
+    pcounts[n]=0;*/
     return true;
   }
 
@@ -99,13 +125,11 @@ bool BTree::set_node(uint n,vec μ,mat Σ){
   BTreeNode* q = cpy.get();
 
   for (size_t i = 0; i < msb; i++) {
-
     p = p->next(static_cast<direction>(m&1));
     q->set_next(static_cast<direction>(m&1),std::make_shared<BTreeNodeI>(
                                   p->next_s(left),
                                   p->next_s(right)));
     q = q->next(static_cast<direction>(m&1));
-
     m = n >> (msb-i-1);
   }
 
@@ -114,8 +138,54 @@ bool BTree::set_node(uint n,vec μ,mat Σ){
     return false;
   }
 
-  q->set_next(static_cast<direction>(m&1),std::move(build_tree(0,n,μ,Σ)));
+  q->set_next(static_cast<direction>(m&1),std::move(build_tree(0,n,μ,Σ,p->next(static_cast<direction>(m&1))->get_pcount()+1)));
   root = cpy;
+  /*auto it = pcounts.find(n);
+  if (it != pcounts.end()) {
+    if (++(it->second) > ptresholdh) {
+      pcounts.erase(it);
+    }
+  }*/
+  //pcounts[n]++;
+  return true;
+}
+
+bool BTree::rm_node(uint n) {
+  //std::cout << "removing " << n <<  '\n';
+  if (n >= (uint) pow(2,height) || root == nullptr) {
+    return false;
+  }
+
+  uint msb = height-1;
+  uint m = n >> msb;
+
+  BTreeNode* p = root.get();
+  std::shared_ptr<BTreeNode> cpy = std::make_shared<BTreeNodeI>(
+                                  p->next_s(left),
+                                  p->next_s(right));
+
+  BTreeNode* q = cpy.get();
+
+  for (size_t i = 0; i < msb; i++) {
+
+    p = p->next(static_cast<direction>(m&1));
+    q->set_next(static_cast<direction>(m&1),std::make_shared<BTreeNodeI>(
+                                  p->next_s(left),
+                                  p->next_s(right)));
+    q = q->next(static_cast<direction>(m&1));
+    m = n >> (msb-i-1);
+
+  }
+
+  if (p->next(static_cast<direction>(m&1)) == nullptr) {
+    cpy.reset();
+    return false;
+  }
+
+  q->set_next(static_cast<direction>(m&1),nullptr);
+  root = cpy;
+  avail.push(n);
+  size--;
   return true;
 }
 
@@ -141,13 +211,102 @@ bool BTree::get_node(uint n,vec& μ ,mat& Σ) const{
 
   p->next(static_cast<direction>(m&1))->get_μΣ(μ,Σ);
   return true;
-
 }
 
-std::shared_ptr<BTree::BTreeNode> BTree::build_tree(uint h,uint n,vec& μ,mat& Σ){
+bool BTree::dec_pcount(uint n) {
+  if (n >= (uint) pow(2,height) || root == nullptr) {
+    return false;
+  }
+  //std::cout << pcounts.size() << '\n';
+  /*auto it = pcounts.find(n);
+  if (it != pcounts.end()) {
+    if (--(it->second) < ptresholdl) {
+      rm_node(n);
+      pcounts.erase(it);
+    }
+  }*/
+    /*if (--pcounts[n] < ptresholdl) {
+    rm_node(n);
+  }*/
+  /*uint msb = height-1;
+  uint m = n >> msb;
+
+  BTreeNode* p = root.get();
+  std::shared_ptr<BTreeNode> cpy = std::make_shared<BTreeNodeI>(
+                                  p->next_s(left),
+                                  p->next_s(right));
+
+  BTreeNode* q = cpy.get();
+
+  for (size_t i = 0; i < msb; i++) {
+
+    p = p->next(static_cast<direction>(m&1));
+    q->set_next(static_cast<direction>(m&1),std::make_shared<BTreeNodeI>(
+                                  p->next_s(left),
+                                  p->next_s(right)));
+    q = q->next(static_cast<direction>(m&1));
+    m = n >> (msb-i-1);
+  }
+
+  if (p->next(static_cast<direction>(m&1)) == nullptr) {
+    cpy.reset();
+    return false;
+  }
+
+  unsigned char pc =  p->next(static_cast<direction>(m&1))->get_pcount();
+  if ( pc-1 < ptresholdl ) {
+    q->set_next(static_cast<direction>(m&1),nullptr);
+    size--;
+    avail.push(n);
+  }
+  else {
+    vec μ(2);
+    mat Σ(2,2);
+    p->next(static_cast<direction>(m&1))->get_μΣ(μ,Σ);
+    q->set_next(static_cast<direction>(m&1),std::move(build_tree(0,n,μ,Σ,pc-1)));
+  }
+  root = cpy;*/
+
+  /*auto it = pcounts.find(n);
+  if (it != pcounts.end()) {
+    if (++(it->second) > ptresholdh) {
+      pcounts.erase(it);
+    }
+  }*/
+  //pcounts[n]++;
+
+  uint msb = height-1;
+  uint m = n >> msb;
+  uint num_nodes = 0;
+
+  BTreeNode* p = root.get();
+  num_nodes += root.use_count();
+
+  for (size_t i = 0; i < msb; i++) {
+    num_nodes += p->next_s(static_cast<direction>(m&1)).use_count();
+    p = p->next(static_cast<direction>(m&1));
+    m = n >> (msb-i-1);
+  }
+
+  if (p->next(static_cast<direction>(m&1)) == nullptr) {
+    return false;
+  }
+
+  num_nodes += p->next_s(static_cast<direction>(m&1)).use_count();
+  //decrement persistence count by fractional part of 1 to take into account node sharing between particles.
+  double pcount_m = p->next(static_cast<direction>(m&1))->dec_pcount(num_nodes);
+
+  if (pcount_m < (double)ptresholdl) {
+    rm_node(n);
+  }
+
+  return true;
+}
+
+std::shared_ptr<BTree::BTreeNode> BTree::build_tree(uint h,uint n,vec& μ,mat& Σ, signed char pc) {
 
   if (h == 0) {
-    std::shared_ptr<BTree::BTreeNode> res = std::make_shared<BTree::GaussianNode>(μ,Σ);
+    std::shared_ptr<BTree::BTreeNode> res = std::make_shared<BTree::GaussianNode>(μ,Σ,pc);
     return res;
   }
 
@@ -158,11 +317,11 @@ std::shared_ptr<BTree::BTreeNode> BTree::build_tree(uint h,uint n,vec& μ,mat& �
   if (m) {
     res = std::make_shared<BTree::BTreeNodeI>(
                                   nullptr,
-                                  build_tree(h-1,n,μ,Σ));
+                                  build_tree(h-1,n,μ,Σ,pc));
   }
   else {
     res = std::make_shared<BTree::BTreeNodeI>(
-                                  build_tree(h-1,n,μ,Σ),
+                                  build_tree(h-1,n,μ,Σ,pc),
                                   nullptr);
   }
   return res;
@@ -175,6 +334,7 @@ void BTree::select(vec μ,std::map<uint, NodeRef>& map) const {
 
 void BTree::select_rec(BTreeNode* p,vec μ,std::map<uint, NodeRef>& map, uint h,uint& n) const {
   if (!p) {
+    n += (1<<h);
     return;
   }
   if (h == 0) {
@@ -184,8 +344,15 @@ void BTree::select_rec(BTreeNode* p,vec μ,std::map<uint, NodeRef>& map, uint h,
     vec δ = m - μ(span(0,1));
     if ( std::abs(δ[0]) < 75
         && std::abs(δ[1]) < 75
-        && δ[0]*std::cos(μ(2)) + δ[1]*std::sin(μ(2)) > -5 ) {
-      map.try_emplace(n,m,s);
+        && δ[0]*std::cos(μ(2)) + δ[1]*std::sin(μ(2)) > -0.1*norm(δ) ) {
+      bool nflag = false;
+
+      if (std::abs(δ[0]) < 30
+          && std::abs(δ[1]) < 30
+        /*&& δ[0]*std::cos(μ(2)) + δ[1]*std::sin(μ(2)) > 0.01*norm(δ)*/) {
+        nflag = true;
+      }
+      map.try_emplace(n,m,s,nflag);
     }
     ++n;
     return;
@@ -193,6 +360,28 @@ void BTree::select_rec(BTreeNode* p,vec μ,std::map<uint, NodeRef>& map, uint h,
 
   select_rec(p->next(left),μ,map,h-1,n);
   select_rec(p->next(right),μ,map,h-1,n);
+
+}
+
+void BTree::print_tree(std::ostream& os) const {
+  BTreeNode* p = root.get();
+  print_tree_rec(os,p,height);
+}
+
+void BTree::print_tree_rec(std::ostream& os,BTreeNode* p, uint h) const{
+  if (!p) {
+    return;
+  }
+  if (h == 0) {
+    vec m(2);
+    mat s(2,2);
+    p->get_μΣ(m,s);
+    os << std::setw(15) << m(0)
+          << std::setw(15)  << m(1) << '\n';
+  }
+
+  print_tree_rec(os,p->next(left),h-1);
+  print_tree_rec(os,p->next(right),h-1);
 }
 
 void BTree::print(std::ostream& os) const{
@@ -237,10 +426,10 @@ void Particle::motion(double v, double α, double dt, mat z){
   if (z.n_elem == 0) {
     position.each_col( [v,α,dt](vec& a){ a += equation_motion(a[2],v,α,dt);} );
     position += mvnrnd(vec({0,0,0}),rnoise,particleCount);
-    //std::cout << position << '\n';
   }
   else{
     motion_measurement(v,α,dt,z);
+    resample();
   }
 }
 
@@ -250,7 +439,7 @@ void Particle::motion_measurement(double v, double α, double dt, mat z){
   mat prediction(position);
   //std::cout << position << '\n';
   prediction.each_col( [v,α,dt](vec& a){ a += equation_motion(a[2],v,α,dt);} );
-  const uint k = z.n_cols;
+  //const uint k = z.n_cols;
 
   unsigned int nt = std::thread::hardware_concurrency();
   std::vector<std::thread> threads;
@@ -273,6 +462,7 @@ void Particle::motion_measurement(double v, double α, double dt, mat z){
   }
 
   threads.clear();
+
 }
 
 void motion_dist(BTree* b_trees,mat& position,mat& prediction,
@@ -289,19 +479,16 @@ void motion_dist(BTree* b_trees,mat& position,mat& prediction,
   index.push_back(particleCount);
   uint start_indx = index[jj];
   uint end_indx = index[jj+1];
-
   uint k = z.n_cols;
 
-  std::thread::id this_id = std::this_thread::get_id();
-
-
-    //std::cout << "thread " << this_id << " working on"
-      //<<start_indx << "to" << end_indx <<"\n";
-
+  /*std::thread::id this_id = std::this_thread::get_id();
+    std::cout << "thread " << this_id << " working on"
+      <<start_indx << "to" << end_indx <<"\n";*/
 
   for (uint i = start_indx; i < end_indx; i++){
     BTree* p = &b_trees[i];
-    uint ts = p->get_size();
+    //uint ts = p->get_size();
+    //std::cout << "map size: " << ts << '\n';
     vec mini = 1e6*ones<vec>(k);
     vec argmini = zeros<vec>(k);
 
@@ -309,7 +496,6 @@ void motion_dist(BTree* b_trees,mat& position,mat& prediction,
     p->select(prediction.col(i),map);
     uint ms = map.size();
     std::map<uint,uint> indx;
-    //std::cout << ts << '\n';
     mat Ω(3*ms,3);
     mat w(ms,k);
     uint ctr = 0;
@@ -332,11 +518,6 @@ void motion_dist(BTree* b_trees,mat& position,mat& prediction,
       mat μx = inv(Ωx+inv(rnoise))*hx.t()*qinv*δ;
       vec predx = prediction.col(i);
       mat sample_x(μx);
-    /*  std::cout << predx <<  '\n';
-      std::cout << μ <<  '\n';
-      std::cout << Σ <<  '\n';
-      std::cout << h <<  '\n';
-      std::cout << q <<  '\n';*/
       sample_x.each_col([Ωx,predx,rnoise](vec& a){a += predx + mvnrnd(a,inv(Ωx+inv(rnoise)),1);});
       mat zhat1(2,k);
       for (size_t l = 0; l < k; l++) {
@@ -357,43 +538,53 @@ void motion_dist(BTree* b_trees,mat& position,mat& prediction,
       }
       ++ctr;
     }
-    weight(i) = 1;
+    //weight(i) = 1;
     mat Ωx = inv(rnoise);
     vec μx = zeros<vec>(3);
     for (size_t l = 0; l < k; l++) {
       if (mini(l) > c2) {
+
+        //if (z(0,l) > 50 ) {
+            //continue;
+        //}
         //sample particle position using information gathered so far.
-        vec sample_x =   prediction.col(i) + mvnrnd(μx,inv(Ωx),1);
+        //vec sample_x =   prediction.col(i) + mvnrnd(μx,inv(Ωx),1);
+        vec sample_x = prediction.col(i) + μx;
         vec μ(2);
         mat Σ(2,2);
         μ = inverse_measurement(sample_x,z.col(l));
         mat h = jacobian_measurement(sample_x,μ);
-        Σ = inverse(h(span(0,1),span(3,4))).t()*qnoise*inverse(h(span(0,1),span(3,4)));
+        /*μ = inverse_measurement(prediction.col(i)+μx,z.col(l));
+        mat h = jacobian_measurement(prediction.col(i)+μx,μ);*/
+        Σ = inv(h(span(0,1),span(3,4))).t()*qnoise*inv(h(span(0,1),span(3,4)));
         mat hm = h(span(0,1),span(3,4));
         mat q = hm*Σ*hm.t()+qnoise;
         weight(i) *= 1/sqrt(det(2*π*q))*exp(-3);
-        //std::cout << Σ << '\n';
-        p->add_node(ts++,μ,Σ);
-        //std::cout << *p << '\n';
+        p->add_node(μ,Σ);
       }
       else  {
-        const auto& ldmrk = map[argmini(l)];
+        //vec sample_x =   prediction.col(i) + mvnrnd(μx,inv(Ωx),1);
+        vec sample_x = prediction.col(i) + μx;
+        auto& ldmrk = map[argmini(l)];
         vec μ = ldmrk.m;
         mat Σ = ldmrk.s;
-        mat h = jacobian_measurement(prediction.col(i)+μx,μ);
+        ldmrk.pflag = false;
+        //mat h = jacobian_measurement(prediction.col(i)+μx,μ);
+        mat h = jacobian_measurement(sample_x,μ);
         mat hx = h(span(0,1),span(0,2));
         mat hm = h(span(0,1),span(3,4));
         mat q = hm*Σ*hm.t()+qnoise;
-        mat qinv = inverse(q);
+        mat qinv = inv(q);
         mat kf = Σ*hm.t()*qinv;
-        vec zhat = equation_measurement(prediction.col(i)+μx,μ);
+        //vec zhat = equation_measurement(prediction.col(i)+μx,μ);
+        vec zhat = equation_measurement(sample_x,μ);
         mat δ = z.col(l) - zhat;
         δ(1) = measure(δ(1));
         μ = μ + kf*δ;
         Σ = (eye<mat>(2,2)-kf*hm)*Σ;
         p->set_node(argmini(l),μ,Σ);
         mat lk = hx*rnoise*hx.t() + hm*Σ*hm.t() + qnoise;
-        mat ω = 1/sqrt(det(2*π*lk))*exp(-1/2*δ.t()*inverse(lk)*δ);
+        mat ω = 1/sqrt(det(2*π*lk))*exp(-1/2*δ.t()*inv(lk)*δ);
         weight(i) *= ω(0,0);
         uint j = indx[argmini(l)];
         mat Ωm = Ω(span(3*j,3*j+2),span(0,2));
@@ -403,6 +594,12 @@ void motion_dist(BTree* b_trees,mat& position,mat& prediction,
     }
     //sample particle position using information gathered from measurements.
     position.col(i) = prediction.col(i) + mvnrnd(μx,inv(Ωx),1);
+
+    for( auto const& [n, ldmrk] : map ) {
+      if (ldmrk.pflag) {
+        p->dec_pcount(n);
+      }
+    }
   }
 }
 
@@ -440,7 +637,6 @@ void Particle::resample(){
 }
 
 void Particle::print(std::ostream& os) const{
-
   for (size_t i = 0; i < particleCount; i++) {
     os << std::setw(15) << position(0,i)
           << std::setw(15)  << position(1,i)
