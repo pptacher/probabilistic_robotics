@@ -39,6 +39,7 @@ private:
   BTree* b_trees;
 
   void motion_measurement(double,double,double,mat);
+  void resample_dist(BTree*,mat&,std::map<uint,uint>&,uint*,uint,uint);
 
 };
 

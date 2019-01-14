@@ -634,24 +634,84 @@ void Particle::resample(){
         ++m[d(gen)];
     }
 
+    uint *cumsum = new uint[particleCount]();
+    uint cs = 0;
+    uint b=0;
+    for( auto const& [k,val] : m ) {
+      while (b < k) {
+        cumsum[b++] = cs;
+      }
+      cs += val;
+      cumsum[k] = cs;
+      ++b;
+    }
+    while (b < particleCount) {
+      cumsum[b++] = cs;
+    }
+
+    unsigned int nt = std::thread::hardware_concurrency();
+    uint chunk =  std::ceil(((double)particleCount) / nt);
+
+    std::vector<uint> index;
+    for (size_t i = 0; i < particleCount; i+=chunk) {
+      index.push_back(i);
+    }
+    index.push_back(particleCount);
+
     BTree* b_trees_tmp = new BTree[particleCount];
     mat position_tmp(3,particleCount);
-    uint j = 0;
-    for( auto const& [key, val] : m ){
-      for (size_t t = 0; t < val; t++) {
-        //std::cout << key << ' ' << val << '\n';
-        b_trees_tmp[j] = b_trees[key];
-        position_tmp.col(j++) = position.col(key);
-        //std::cout << b_trees_tmp[j-1] << '\n';
-        //std::cout << b_trees[key] << '\n';
-      //b_trees[key].initialize(vec({}),mat({}));
-      }
+
+    std::vector<std::thread> threads;
+    for (uint j=0; j<nt; ++j) {
+      threads.push_back(std::thread(&Particle::resample_dist,
+                                          this,
+                                          b_trees_tmp,
+                                          std::ref(position_tmp),
+                                          std::ref(m),
+                                          cumsum,
+                                          index[j],
+                                          index[j+1]));
     }
+
+    for (auto& th : threads) {
+      th.join();
+    }
+
+    threads.clear();
 
     std::swap(b_trees,b_trees_tmp);
     position = position_tmp;
     weight.ones();
     delete[] b_trees_tmp;
+    delete[] cumsum;
+
+}
+
+void Particle::resample_dist(BTree* bt,
+                              mat& pt,
+                              std::map<uint,uint>& m,
+                              uint* cumsum,
+                              uint start_indx,
+                              uint end_indx) {
+  uint i;
+  for (i = 0; cumsum[i] <= start_indx ; i++) {}
+  uint start_k = i;
+  for (;i < particleCount && cumsum[i] <= end_indx ; i++) {}
+  uint end_k = i;
+  //uint j=start_indx;
+  /*std::thread::id this_id = std::this_thread::get_id();
+    std::cout << "thread " << this_id << " working on"
+      <<start_k << "to" << end_k <<"\n";*/
+   for( uint t=start_k; t<end_k; ++t) {
+      for (uint j=(t==0)?0:cumsum[t-1];
+            j < cumsum[t];
+            ++j) {
+
+        bt[j] = b_trees[t];
+        pt.col(j) = position.col(t);
+      }
+    }
+
 }
 
 void Particle::print(std::ostream& os) const{
