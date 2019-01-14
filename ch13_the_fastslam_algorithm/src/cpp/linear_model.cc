@@ -9,8 +9,12 @@ const static float a = 0.95 + l;
 const static float b = 0.50;
 
 double measure(double θ){
-  double tmp = std::fmod(θ,2*π);
-  return tmp - ((int) (tmp/π))*2*π;
+  int ϵ = (std::sin(θ) >=0) ? 1 : -1;
+  double res =  ϵ*std::acos(std::cos(θ));
+  if  (res >= π || res < -π){
+    std::cout << ":()" << '\n';
+  }
+  return res;
 }
 
 mat inverse(mat q){

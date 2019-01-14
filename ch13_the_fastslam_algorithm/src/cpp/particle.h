@@ -28,6 +28,10 @@ public:
   void resample();
   void print(std::ostream&) const;
 
+  void print_tree(std::ostream& os) const{
+    b_trees[0].print_tree(os);
+  }
+
 private:
   unsigned int  const particleCount;
   mat position;
