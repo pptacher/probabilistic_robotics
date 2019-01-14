@@ -108,6 +108,7 @@ lib : libfslam.so
 build : fslam.bin
 
 clean :
+	@rm data/poses.dat data/ldmarks.dat
 	@rm -f *~ *.o *.so *.bin
 	@rm -rf $(ARCHIVE_DIR_NAME) $(ARCHIVE_NAME)
 	@echo
