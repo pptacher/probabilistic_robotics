@@ -40,11 +40,12 @@ bool BTree::add_node(uint n,vec μ,mat Σ){
   //std::cout << "adding : " << n << '\n';
   if (root == nullptr) {
     root = std::move(build_tree(0,n,μ,Σ));
-    ++size;
-    /*if (pcounts.size() <= n) {
-      pcounts.resize(2*pcounts.size()+1,0);
+    if (size == n) {
+      pcounts.push_back(0);
     }
-    pcounts[n]=0;*/
+    else
+      pcounts[n]=0;
+    ++size;
     return true;
   }
 
@@ -52,13 +53,19 @@ bool BTree::add_node(uint n,vec μ,mat Σ){
     root = std::make_shared<BTree::BTreeNodeI>(
                                   std::move(root),
                                   std::move(build_tree(height,n,μ,Σ)));
-    ++height;
-    ++size;
+
     //pcounts[n] = 0;
     /*if (pcounts.size() <= n) {
       pcounts.resize(2*pcounts.size()+1,0);
     }
     pcounts[n]=0;*/
+    if (size == n) {
+      pcounts.push_back(0);
+    }
+    else
+      pcounts[n]=0;
+    ++height;
+    ++size;
     return true;
   }
 
@@ -77,11 +84,16 @@ bool BTree::add_node(uint n,vec μ,mat Σ){
     if (!p->next(static_cast<direction>(m&1))) {
       q->set_next(static_cast<direction>(m&1),std::move(build_tree(msb-i,n,μ,Σ)));
       root = cpy;
-      ++size;
       /*if (pcounts.size() <= n) {
         pcounts.resize(2*pcounts.size()+1,0);
       }
       pcounts[n]=0;*/
+      if (size == n) {
+        pcounts.push_back(0);
+      }
+      else
+        pcounts[n]=0;
+      ++size;
       return true;
     }
 
@@ -96,11 +108,16 @@ bool BTree::add_node(uint n,vec μ,mat Σ){
   if (p->next(static_cast<direction>(m&1)) == nullptr) {
     q->set_next(static_cast<direction>(m&1),std::move(build_tree(0,n,μ,Σ)));
     root = cpy;
-    ++size;
     /*if (pcounts.size() <= n) {
       pcounts.resize(2*pcounts.size()+1,0);
     }
     pcounts[n]=0;*/
+    if (size == n) {
+      pcounts.push_back(0);
+    }
+    else
+      pcounts[n]=0;
+    ++size;
     return true;
   }
 
@@ -138,7 +155,7 @@ bool BTree::set_node(uint n,vec μ,mat Σ){
     return false;
   }
 
-  q->set_next(static_cast<direction>(m&1),std::move(build_tree(0,n,μ,Σ,p->next(static_cast<direction>(m&1))->get_pcount()+1)));
+  q->set_next(static_cast<direction>(m&1),std::move(build_tree(0,n,μ,Σ)));
   root = cpy;
   /*auto it = pcounts.find(n);
   if (it != pcounts.end()) {
@@ -146,7 +163,7 @@ bool BTree::set_node(uint n,vec μ,mat Σ){
       pcounts.erase(it);
     }
   }*/
-  //pcounts[n]++;
+  pcounts[n]++;
   return true;
 }
 
@@ -225,10 +242,11 @@ bool BTree::dec_pcount(uint n) {
       pcounts.erase(it);
     }
   }*/
-    /*if (--pcounts[n] < ptresholdl) {
+    if (--pcounts[n] < ptresholdl) {
     rm_node(n);
-  }*/
-  /*uint msb = height-1;
+    }
+    return true;
+  /*int msb = height-1;
   uint m = n >> msb;
 
   BTreeNode* p = root.get();
@@ -275,7 +293,7 @@ bool BTree::dec_pcount(uint n) {
   }*/
   //pcounts[n]++;
 
-  uint msb = height-1;
+/*  uint msb = height-1;
   uint m = n >> msb;
   uint num_nodes = 1;
 
@@ -300,13 +318,13 @@ bool BTree::dec_pcount(uint n) {
     rm_node(n);
   }
 
-  return true;
+  return true;*/
 }
 
-std::shared_ptr<BTree::BTreeNode> BTree::build_tree(uint h,uint n,vec& μ,mat& Σ, signed char pc) {
+std::shared_ptr<BTree::BTreeNode> BTree::build_tree(uint h,uint n,vec& μ,mat& Σ/*, signed char pc*/) {
 
   if (h == 0) {
-    std::shared_ptr<BTree::BTreeNode> res = std::make_shared<BTree::GaussianNode>(μ,Σ,pc);
+    std::shared_ptr<BTree::BTreeNode> res = std::make_shared<BTree::GaussianNode>(μ,Σ);
     return res;
   }
 
@@ -317,11 +335,11 @@ std::shared_ptr<BTree::BTreeNode> BTree::build_tree(uint h,uint n,vec& μ,mat& �
   if (m) {
     res = std::make_shared<BTree::BTreeNodeI>(
                                   nullptr,
-                                  build_tree(h-1,n,μ,Σ,pc));
+                                  build_tree(h-1,n,μ,Σ));
   }
   else {
     res = std::make_shared<BTree::BTreeNodeI>(
-                                  build_tree(h-1,n,μ,Σ,pc),
+                                  build_tree(h-1,n,μ,Σ),
                                   nullptr);
   }
   return res;

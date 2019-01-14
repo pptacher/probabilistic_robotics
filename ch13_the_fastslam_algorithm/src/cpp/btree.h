@@ -76,13 +76,13 @@ public:
 private:
   uint height = 0;
   uint size = 0;
-  static signed char const ptresholdl = -5;
+  static signed char const ptresholdl = -20;
   //static signed char const ptresholdh = 20;
   std::queue<uint> avail;
   //std::map<uint,signed char> pcounts;
-  //std::vector<signed char> pcounts;
+  std::vector<signed char> pcounts;
   std::shared_ptr<BTreeNode> root = nullptr;
-  std::shared_ptr<BTree::BTreeNode> build_tree(uint,uint,vec&,mat&, signed char pc=0);
+  std::shared_ptr<BTree::BTreeNode> build_tree(uint,uint,vec&,mat&/*, signed char pc=0*/);
   void preorder(BTreeNode* p,std::ostream&) const;
   void select_rec(BTreeNode*,vec,std::map<uint, NodeRef>&, uint,uint&) const;
   void print_tree_rec(std::ostream& os,BTreeNode* p, uint h) const;
@@ -96,8 +96,8 @@ public:
   virtual void set_next(direction,std::shared_ptr<BTreeNode>) = 0;
   virtual void print(std::ostream&) const = 0;
   virtual bool get_μΣ(vec&,mat&) const = 0;
-  virtual float dec_pcount(uint) = 0;
-  virtual float get_pcount() const = 0;
+  //virtual float dec_pcount(uint) = 0;
+  //virtual float get_pcount() const = 0;
 };
 
 struct BTree::BTreeNodeI : public BTree::BTreeNode{
@@ -155,13 +155,13 @@ public:
     return false;
   }
 
-  virtual float dec_pcount(uint) override {
+/*  virtual float dec_pcount(uint) override {
     return 0;
   };
 
   virtual float get_pcount() const override {
     return 0;
-  };
+  };*/
 };
 
 class BTree::GaussianNode  :public BTree::BTreeNode{
@@ -207,7 +207,7 @@ public:
 
   void set_next(direction d, std::shared_ptr<BTreeNode> ptr) override{};
 
-  virtual float dec_pcount(uint nn) override {
+  /*virtual float dec_pcount(uint nn) override {
     std::lock_guard<std::mutex> guard(pcount_mutex);
     pcount -= 1/((float) nn);
     return pcount;
@@ -216,5 +216,5 @@ public:
   virtual float get_pcount() const override {
     std::lock_guard<std::mutex> guard(pcount_mutex);
     return pcount;
-  }
+  }*/
 };
