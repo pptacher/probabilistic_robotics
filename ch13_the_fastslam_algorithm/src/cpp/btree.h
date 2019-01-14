@@ -166,8 +166,8 @@ public:
 
 class BTree::GaussianNode  :public BTree::BTreeNode{
 public:
-  GaussianNode(vec m,mat s, float pc = 0):
-    pcount(pc) {
+  GaussianNode(vec m,mat s/*, float pc = 0*/)
+    /*pcount(pc) */{
     this->μ = m;
     this->Σ = s;
     //std::cout << "ctor GaussianNode" << '\n';
@@ -182,8 +182,8 @@ public:
 private:
   vec μ = zeros<vec>(2);
   mat Σ = zeros<mat>(2,2);
-  float pcount;
-  mutable std::mutex pcount_mutex;
+  //float pcount;
+  //mutable std::mutex pcount_mutex;
 
 public:
   BTreeNode* next(direction) const override{
