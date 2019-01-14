@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <iterator>
 #include <queue>
+#include <mutex>
 #include "mkl_lapacke.h"
 //#include "mkl.h"
 
@@ -182,6 +183,7 @@ private:
   vec μ = zeros<vec>(2);
   mat Σ = zeros<mat>(2,2);
   float pcount;
+  mutable std::mutex pcount_mutex;
 
 public:
   BTreeNode* next(direction) const override{
@@ -206,11 +208,13 @@ public:
   void set_next(direction d, std::shared_ptr<BTreeNode> ptr) override{};
 
   virtual float dec_pcount(uint nn) override {
+    std::lock_guard<std::mutex> guard(pcount_mutex);
     pcount -= 1/((float) nn);
     return pcount;
   }
 
   virtual float get_pcount() const override {
+    std::lock_guard<std::mutex> guard(pcount_mutex);
     return pcount;
   }
 };
