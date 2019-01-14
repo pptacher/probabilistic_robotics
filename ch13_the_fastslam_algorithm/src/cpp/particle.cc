@@ -277,13 +277,13 @@ bool BTree::dec_pcount(uint n) {
 
   uint msb = height-1;
   uint m = n >> msb;
-  uint num_nodes = 0;
+  uint num_nodes = 1;
 
   BTreeNode* p = root.get();
-  num_nodes += root.use_count();
+  num_nodes *= root.use_count();
 
   for (size_t i = 0; i < msb; i++) {
-    num_nodes += p->next_s(static_cast<direction>(m&1)).use_count();
+    num_nodes *= p->next_s(static_cast<direction>(m&1)).use_count();
     p = p->next(static_cast<direction>(m&1));
     m = n >> (msb-i-1);
   }
@@ -292,7 +292,7 @@ bool BTree::dec_pcount(uint n) {
     return false;
   }
 
-  num_nodes += p->next_s(static_cast<direction>(m&1)).use_count();
+  num_nodes *= p->next_s(static_cast<direction>(m&1)).use_count();
   //decrement persistence count by fractional part of 1 to take into account node sharing between particles.
   double pcount_m = p->next(static_cast<direction>(m&1))->dec_pcount(num_nodes);
 
