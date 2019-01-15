@@ -76,7 +76,7 @@ public:
 private:
   uint height = 0;
   uint size = 0;
-  static signed char const ptresholdl = -20;
+  static signed char const ptresholdl = -10;
   //static signed char const ptresholdh = 20;
   std::queue<uint> avail;
   //std::map<uint,signed char> pcounts;
