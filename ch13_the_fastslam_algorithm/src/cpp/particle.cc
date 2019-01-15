@@ -459,7 +459,8 @@ void Particle::motion_measurement(double v, double α, double dt, mat z){
   prediction.each_col( [v,α,dt](vec& a){ a += equation_motion(a[2],v,α,dt);} );
   //const uint k = z.n_cols;
 
-  unsigned int nt = std::thread::hardware_concurrency();
+  const float workLoad = 20.0;
+  unsigned int nt = std::min(std::thread::hardware_concurrency(),(uint)std::ceil(particleCount/workLoad));
   std::vector<std::thread> threads;
   for (uint j=0; j<nt; ++j) {
     threads.push_back(std::thread(motion_dist,
@@ -648,8 +649,8 @@ void Particle::resample(){
     while (b < particleCount) {
       cumsum[b++] = cs;
     }
-
-    unsigned int nt = std::thread::hardware_concurrency();
+    const float workLoad = 50.0;
+    unsigned int nt = std::min(std::thread::hardware_concurrency(),(uint)std::ceil(particleCount/workLoad));
     uint chunk =  std::ceil(((double)particleCount) / nt);
 
     std::vector<uint> index;
