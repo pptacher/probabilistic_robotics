@@ -117,6 +117,7 @@ clean :
 install : fslam.bin libfslam.so
 	@mkdir -p $(INSTALL_DIRS)
 	@cp fslam.bin  $(INSTALL_BIN_DIR)
+	@cp data -r  $(INSTALL_BIN_DIR)
 	@cp libfslam.so $(INSTALL_LIB_DIR)
 	@cp *.h  $(INSTALL_INCLUDE_DIR)
 	@echo "File installed in " $(INSTALL_BIN_DIR) $(INSTALL_LIB_DIR) $(INSTALL_INCLUDE_DIR)
