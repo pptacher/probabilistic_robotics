@@ -22,13 +22,13 @@ cd fastslam_web
 4. Build the docker image
 
 ```
-docker build --tag=*fastslam* .
+docker build --tag=fastslam .
 ```
 
 5. Run it
 
 ```
-docker -p 3000:3000 run *fastslam*
+docker run -p 3000:3000 fastslam
 ```
 
 6. Navigate to [http://localhost:3000](http://localhost:3000). If you use Docker through Linux virtual machine (MacOS), you may have to access the web app with something like [192.168.99.100:3000](192.168.99.100:3000).
