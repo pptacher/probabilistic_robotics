@@ -39,7 +39,8 @@ RUN wget https://sourceforge.net/projects/arma/files/armadillo-9.200.7.tar.xz \
 WORKDIR /app
 COPY . /app
 
-RUN ./to_UCN.sh btree.h \
+RUN chmod +x to_UCN.sh \
+  && ./to_UCN.sh btree.h \
   && ./to_UCN.sh particle.h \
   && ./to_UCN.sh linear_model.cc \
   && ./to_UCN.sh particle.cc \
