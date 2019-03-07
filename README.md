@@ -1,5 +1,5 @@
 # fastslam_web
-Experimental fastslam algorithm webapp.
+Experimental fastslam algorithm webapp. C++ application is running asynchronously, streaming particles positions to node.js server. Data is forwarded to client through socket. 
 
 ## Installation
 
@@ -31,4 +31,4 @@ docker build --tag=fastslam .
 docker run -p 3000:3000 fastslam
 ```
 
-6. Navigate to [http://localhost:3000](http://localhost:3000). If you use Docker through Linux virtual machine (MacOS), you may have to access the web app with something like [192.168.99.100:3000](192.168.99.100:3000).
+6. Navigate to [http://localhost:3000](http://localhost:3000). If you use Docker through Linux virtual machine (MacOS), you may have to access the web app with something like [192.168.99.100:3000](http://192.168.99.100:3000).
