@@ -1,5 +1,5 @@
 # fastslam_web
-Experimental fastslam algorithm webapp. C++ application is running asynchronously, streaming particles positions to node.js server. Data is forwarded to client through socket. 
+Experimental fastslam algorithm web application. C++ application is running asynchronously, streaming particles positions to node.js server. Data is forwarded to client through socket. 
 
 ## Installation
 
