@@ -39,12 +39,14 @@ RUN wget https://sourceforge.net/projects/arma/files/armadillo-9.200.7.tar.xz \
 WORKDIR /app
 COPY . /app
 
-RUN chmod +x to_UCN.sh \
+RUN cd src \
+  && chmod +x to_UCN.sh \
   && ./to_UCN.sh btree.h \
   && ./to_UCN.sh particle.h \
   && ./to_UCN.sh linear_model.cc \
   && ./to_UCN.sh particle.cc \
-  && ./to_UCN.sh fastslam.cc
+  && ./to_UCN.sh fastslam.cc \
+  && cd ..
 
 RUN npm install --unsafe-perm --verbose
 

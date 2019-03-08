@@ -9,6 +9,7 @@
       'addon.cc'
       ],
       'include_dirs': [
+                    'src',
                     '.',
                     '/opt/intel/compilers_and_libraries/linux/mkl/include/',
                     '/usr/include/hdf5/serial'
