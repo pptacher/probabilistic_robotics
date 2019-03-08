@@ -55,8 +55,5 @@ following command will remove all stopped containers, all dangling images, and a
 ```
 docker system prune
 ```
-<<<<<<< HEAD
 
 See also  the [Docker cheat sheet](https://www.docker.com/sites/default/files/Docker_CheatSheet_08.09.2016_0.pdf).
-=======
->>>>>>> 28aa389675d72299787c0ae418b5f3baffd5d94d
