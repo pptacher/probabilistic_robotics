@@ -17,8 +17,7 @@ module.exports.listen = function(app) {
   io.total = 0;
   io.on('connection', function(socket){
     var fastslam = require('./fastslam');
-    var tid, src;
-    var connected=0;
+    var tid=-1, src;
     var req = socket.request;
     var ip = forwarded(req);
     debug('New connection from ' + ip.ip);
@@ -32,13 +31,12 @@ module.exports.listen = function(app) {
       debug('setup-stream');
       [tid, src] = fastslam.instream();
       src.pipe(stream);
-      connected=1
     })
 
     socket.on('disconnect', function(){
-      if (connected==1) {
+      if (tid!=-1) {
         fastslam.killthread(tid);
-        connected=0;
+        tid=-1;
       }
       debug('user disconnected.');
       --io.total;
