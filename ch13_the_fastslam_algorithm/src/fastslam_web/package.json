@@ -1,0 +1,30 @@
+{
+  "name": "probabilistic_robotics",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "devstart": "nodemon ./bin/www"
+  },
+  "gypfile": true,
+  "dependencies": {
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "forwarded-for": "^1.0.1",
+    "fs": "0.0.1-security",
+    "stream": "*",
+    "http-errors": "~1.6.2",
+    "morgan": "~1.9.0",
+    "pug": "2.0.0-beta11",
+    "socket.io": "^2.2.0",
+    "socket.io-stream": "^0.9.1",
+    "bindings": "~1.2.1"
+  },
+  "devDependencies": {
+    "browserify": "^16.2.3",
+    "browserify-middleware": "^8.1.1",
+    "nodemon": "^1.18.10",
+    "socket.io-client": "^2.2.0"
+  }
+}
