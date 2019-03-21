@@ -527,4 +527,66 @@
 \end{axis}    
 \end{tikzpicture}
 
+\tdplotsetmaincoords{0}{0}
+\begin{tikzpicture}[
+    tdplot_main_coords, scale=0.5
+    ]
+    
+   
+    \begin{scope}[canvas is xy plane at z=0, thin, gray]
+    
+    	\draw[fill=black!110!white] (-3,7) rectangle (-2,8);
+      \draw[fill=black] (3,7) rectangle (4,8);
+      
+       \draw[fill=black!92.33!white] (-3,6) rectangle (-2,7);
+     \draw[fill=black!84.6!white] (-2,6) rectangle (-1,7);
+      \draw[fill=black!76.93!white] (-1,6) rectangle (0,7);
+      \draw[fill=black!69.53!white] (0,6) rectangle (1,7);
+      \draw[fill=black!76.93!white] (1,6) rectangle (2,7);
+      \draw[fill=black!84.6!white] (2,6) rectangle (3,7);
+      \draw[fill=black!92.33!white] (3,6) rectangle (4,7);
+      
+       \draw[fill=black!61.8!white] (0,5) rectangle (1,6);
+       \draw[fill=black!54.13!white] (0,4) rectangle (1,5);
+       \draw[fill=black!46.47!white] (0,3) rectangle (1,4);
+       \draw[fill=black!38.73!white] (0,2) rectangle (1,3);
+       \draw[fill=black!31.07!white] (0,1) rectangle (1,2);
+       \draw[fill=black!23.33!white] (0,0) rectangle (1,1);
+       
+       \draw[fill=black!15.57!white] (1,0) rectangle (2,1);
+       \draw[fill=black!8!white] (2,0) rectangle (3,1);
+       \draw[fill=black!0.667!white] (3,0) rectangle (4,1);
+    
+	    
+      \draw[step=1] (1,0) grid (4,1);
+      \draw[step=1] (0,0) grid (1,7);
+      \draw[step=1] (-3,6) grid (4,7);
+      \draw[step=1] (-3,7) grid (-2,8);
+      \draw[step=1] (3,7) grid (4,8);
+      
+      \end{scope}
+
+\end{tikzpicture}
+
+\begin{tikzpicture}[tdplot_main_coords, scale=0.7
+    %z={(0:10mm)},x={(-130:5mm)}%x={(-0.5cm,-0.5cm)}, y={(0.9659cm,-0.25882cm)}, z={(0cm,1cm)}% x-y grid is wacky
+    ]
+        \begin{axis}[
+    hide axis,
+    scale only axis,
+    height=0pt,
+    width=0pt,
+    colormap name=blackwhite,
+    colorbar horizontal,
+    point meta min=-15,
+    point meta max=0,
+    colorbar style={
+        width=10cm,
+        xtick={-15,0}
+    }
+    ]
+    \addplot [draw=none] coordinates {(0,0)};
+\end{axis}    
+\end{tikzpicture}
+
 \end{document}
