@@ -1,0 +1,530 @@
+\documentclass[11pt, fleqn]{standalone}    
+\usepackage[T1]{fontenc} 
+%\usepackage[latin1]{inputenc}
+%\usepackage[english,francais]{babel}
+\usepackage{shellesc}
+\usepackage[retainorgcmds]{IEEEtrantools}   \usepackage{graphicx}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usetikzlibrary{arrows.meta}
+\usepgfplotslibrary{external} 
+\tikzexternalize
+\usepackage{xparse}
+\usepackage{tikz}
+
+\pgfplotsset{width=0.5\textwidth,compat=1.16} 
+
+\pgfplotsset{every axis/.append style={
+                    label style={font=\tiny},
+                    tick label style={font=\tiny}  
+                    }}
+                           
+\pgfplotsset{colormap={blackwhite}{gray(0cm)=(0); gray(1cm)=(1)}
+}
+\pgfplotsset{
+    colormap={coolblackwhite}{rgb255(0cm)=(255,0,255); rgb255(1cm)=(0,128,255); rgb255(1.65cm)=(255,255,255);rgb255(2cm)=(0,0,0)}
+}
+
+
+\definecolor{rp}{rgb}{255,0,255}
+
+\setlength{\textwidth}{\paperwidth}
+\addtolength{\textwidth}{-2in}
+%\calclayout
+
+\graphicspath{{./include/}}
+
+
+\usetikzlibrary{3d}
+\makeatletter
+\tikzoption{canvas is xy plane at z}[]{%
+  \def\tikz@plane@origin{\pgfpointxyz{0}{0}{#1}}%
+  \def\tikz@plane@x{\pgfpointxyz{1}{0}{#1}}%
+  \def\tikz@plane@y{\pgfpointxyz{0}{1}{#1}}%
+  \tikz@canvas@is@plane
+}
+\makeatother
+
+
+\NewDocumentCommand{\DrawCoordinateGrid}{O{} m m m m m m}{%
+    \def\XGridMin{#2}
+    \def\XGridMax{#3}
+    \def\YGridMin{#4}
+    \def\YGridMax{#5}
+    \def\ZGridMin{#6}
+    \def\ZGridMax{#7}
+    %
+    \begin{scope}[canvas is xy plane at z=0, thick, red]
+      \draw [#1] (\XGridMin,\YGridMin) grid (\XGridMax,\YGridMax);
+    \end{scope}
+    \begin{scope}[canvas is yz plane at x=0, thin, blue]
+      \draw [#1] (\YGridMin,\ZGridMin) grid (\YGridMax,\ZGridMax);
+    \end{scope}
+    \begin{scope}[canvas is xz plane at y=0, thin, orange]
+      \draw [#1] (\XGridMin,\ZGridMin) grid (\XGridMax,\ZGridMax);
+    \end{scope}
+}%
+
+\NewDocumentCommand{\DrawParallelGrid}{O{} m m m m }{%
+    \def\XGridMin{#2}
+    \def\XGridMax{#3}
+    \def\YGridMin{#4}
+    \def\YGridMax{#5}
+    %
+    \begin{scope}[canvas is xy plane at z=4, thin, gray]
+      \draw[step=1] (1,0) grid (4,1);
+      \node (waiting 7)  at ( 3.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+      \draw[step=1] (0,0) grid (1,7);
+      \draw[step=1] (-3,6) grid (4,7);
+      \node (waiting 1)  at ( 3.5 ,7.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+              \node (waiting 4)  at ( -2.5 ,7.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+      \draw[step=1] (-3,7) grid (-2,8);
+      \draw[step=1] (3,7) grid (4,8);
+       \node [draw,transform shape] () at (-3,0){$x_{2}=1$};
+    \end{scope}
+    \begin{scope}[canvas is xy plane at z=2, thin, gray]
+      \draw[step=1] (0,0) grid (1,7);
+      \draw[step=1] (1,0) grid (3,1);
+      \node (waiting 8)  at ( 2.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+      \draw[fill=black!20!white] (3,0) rectangle (4,1);
+      \draw[step=1] (-3,6) grid (4,7);
+      \node (waiting 2)  at ( 3.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+       \node (waiting 5)  at ( -2.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+      \draw[fill=black!20!white] (-3,7) rectangle (-2,8);
+      \draw[fill=black!20!white] (3,7) rectangle (4,8);
+       \node [draw,transform shape] () at (-3,0){$x_{2}=0$};
+    \end{scope}
+    \begin{scope}[canvas is xy plane at z=0, thin, gray]
+      %\draw [#1] (\XGridMin,\YGridMin) grid (\XGridMax,\YGridMax);
+      \draw[step=1] (1,0) grid (4,1);
+      \node (waiting 9)  at ( 3.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+      \draw[step=1] (0,0) grid (1,7);
+      \draw[step=1] (-3,6) grid (4,7);
+      \node (waiting 3)  at ( 3.5 ,7.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+       \node (waiting 6)  at ( -2.5 ,7.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+        \node [draw,transform shape] () at (-3,0){$x_{2}=-1$};
+
+       
+      \draw[step=1] (-3,7) grid (-2,8);
+      \draw[step=1] (3,7) grid (4,8);
+      
+       \draw [->,color=black] (waiting 2.north) to[bend right=15] (waiting 1.south);
+       \draw [->,color=black] (waiting 2.south) to[bend left=15] (waiting 3.north);
+       \draw [->,color=black] (waiting 5.north) to[bend right=15] (waiting 4.south);
+       \draw [->,color=black] (waiting 5.south) to[bend left=15] (waiting 6.north);
+       \draw [->,color=black] (waiting 8.north) to[bend right=15] (waiting 7.south);
+       \draw [->,color=black] (waiting 8.south) to[bend left=15] (waiting 9.north);
+    \end{scope}
+}%
+
+\NewDocumentCommand{\DrawParallelGrida}{O{} m m m m }{
+    \def\XGridMin{#2}
+    \def\XGridMax{#3}
+    \def\YGridMin{#4}
+    \def\YGridMax{#5}
+   
+    \begin{scope}[canvas is xy plane at z=4, thin, gray]
+      \draw[step=1] (1,0) grid (4,1);
+      \draw[step=1] (0,0) grid (1,7);
+      \draw[step=1] (-3,6) grid (4,7);
+      \draw[step=1] (-3,7) grid (-2,8);
+      \draw[step=1] (3,7) grid (4,8);
+      
+            \node (0)  at ( -2.5 ,7.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (1)  at ( 3.5 ,7.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (2)  at ( -2.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (3)  at ( -1.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (4)  at ( -0.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (5)  at ( 0.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (6)  at ( 1.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (7)  at ( 2.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (8)  at ( 3.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (9)  at ( 0.5 ,5.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (10)  at ( 0.5 ,4.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (11)  at ( 0.5 ,3.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (12)  at ( 0.5 ,2.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (13)  at ( 0.5 ,1.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (14)  at ( 0.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (15)  at ( 1.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (16)  at ( 2.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (17)  at ( 3.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+              
+              
+                     \foreach \nodea/\nodeb in
+    {17/16,16/15,15/14,14/13,13/12,12/11,11/10,10/9,9/5,5/6,6/7,7/8,8/1,2/3,3/4,4/5}
+  {
+    \draw [->,color=black]  (\nodea) to[] (\nodeb);
+  }
+              
+              
+              
+     \node [draw,transform shape] () at (-3,0){$x_{2}=1$};
+    \end{scope}
+    
+    \begin{scope}[canvas is xy plane at z=2, thin, gray]
+      \draw[step=1] (0,0) grid (1,7);
+      \draw[step=1] (1,0) grid (3,1);
+      \draw[fill=black!20!white] (3,0) rectangle (4,1);
+      \draw[step=1] (-3,6) grid (4,7);
+      \draw[fill=black!20!white] (-3,7) rectangle (-2,8);
+      \draw[fill=black!20!white] (3,7) rectangle (4,8);
+      
+                        \node (0)  at ( -2.5 ,7.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (1)  at ( 3.5 ,7.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (2)  at ( -2.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (3)  at ( -1.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (4)  at ( -0.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (5)  at ( 0.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (6)  at ( 1.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (7)  at ( 2.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (8)  at ( 3.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (9)  at ( 0.5 ,5.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (10)  at ( 0.5 ,4.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (11)  at ( 0.5 ,3.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (12)  at ( 0.5 ,2.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (13)  at ( 0.5 ,1.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (14)  at ( 0.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (15)  at ( 1.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (16)  at ( 2.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (17)  at ( 3.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+              
+              
+                     \foreach \nodea/\nodeb in
+    {16/17,15/16,14/15,13/14,12/13,11/12,10/11,9/10,5/9,6/5,7/6,8/7,2/3,3/4,4/5}
+  {
+    \draw [->,color=black]  (\nodea) to[] (\nodeb);
+  }
+  
+      \node [draw,transform shape] () at (-3,0){$x_{2}=0$};
+    \end{scope}
+    
+    \begin{scope}[canvas is xy plane at z=0, thin, gray]
+      %\draw [#1] (\XGridMin,\YGridMin) grid (\XGridMax,\YGridMax);
+      \draw[step=1] (1,0) grid (4,1);
+      \draw[step=1] (0,0) grid (1,7);
+      \draw[step=1] (-3,6) grid (4,7);
+      \draw[step=1] (-3,7) grid (-2,8);
+      \draw[step=1] (3,7) grid (4,8);
+      
+            \node (0)  at ( -2.5 ,7.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (1)  at ( 3.5 ,7.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (2)  at ( -2.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (3)  at ( -1.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (4)  at ( -0.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (5)  at ( 0.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (6)  at ( 1.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (7)  at ( 2.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (8)  at ( 3.5 ,6.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (9)  at ( 0.5 ,5.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (10)  at ( 0.5 ,4.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (11)  at ( 0.5 ,3.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (12)  at ( 0.5 ,2.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (13)  at ( 0.5 ,1.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (14)  at ( 0.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (15)  at ( 1.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (16)  at ( 2.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+                    \node (17)  at ( 3.5 ,0.5) [color=black,circle, fill, minimum size=1pt,
+              inner sep=0pt, outer sep=0pt,draw] {};
+              
+              
+                     \foreach \nodea/\nodeb in
+    {17/16,16/15,15/14,14/13,13/12,12/11,11/10,10/9,9/5,6/5,7/6,8/7,3/2,4/3,5/4,2/0}
+  {
+    \draw [->,color=black]  (\nodea) to[] (\nodeb);
+  }
+              
+              
+      \node [draw,transform shape] () at (-3,0){$x_{2}=-1$};
+    \end{scope}
+}
+
+\NewDocumentCommand{\DrawParallelGridb}{O{} m m m m }{
+    \def\XGridMin{#2}
+    \def\XGridMax{#3}
+    \def\YGridMin{#4}
+    \def\YGridMax{#5}
+   
+    \begin{scope}[canvas is xy plane at z=4, thin, gray]
+    
+      \draw[fill=black!100!white] (3,7) rectangle (4,8);
+      \draw[fill=rp] (-3,7) rectangle (-2,8);
+      
+       \draw[fill=black!96.1!white] (3,6) rectangle (4,7);
+     \draw[fill=black!92.69!white] (2,6) rectangle (3,7);
+      \draw[fill=black!88.89!white] (1,6) rectangle (2,7);
+      \draw[fill=black!85.08!white] (0,6) rectangle (1,7);
+      \draw[fill=black!81.27!white] (-1,6) rectangle (0,7);
+      \draw[fill=black!77.14!white] (-2,6) rectangle (-1,7);
+      \draw[fill=black!51.75!white] (-3,6) rectangle (-2,7);
+      
+       \draw[fill=black!81.58!white] (0,5) rectangle (1,6);
+       \draw[fill=black!77.78!white] (0,4) rectangle (1,5);
+       \draw[fill=black!74.29!white] (0,3) rectangle (1,4);
+       \draw[fill=black!70.48!white] (0,2) rectangle (1,3);
+       \draw[fill=black!66.98!white] (0,1) rectangle (1,2);
+       \draw[fill=black!63.17!white] (0,0) rectangle (1,1);
+       
+       \draw[fill=black!59.68!white] (1,0) rectangle (2,1);
+       \draw[fill=black!55.87!white] (2,0) rectangle (3,1);
+       \draw[fill=black!52.38!white] (3,0) rectangle (4,1);
+    
+    
+      \draw[step=1] (1,0) grid (4,1);
+      \draw[step=1] (0,0) grid (1,7);
+      \draw[step=1] (-3,6) grid (4,7);
+      \draw[step=1] (-3,7) grid (-2,8);
+      \draw[step=1] (3,7) grid (4,8);
+     \node [draw,transform shape] () at (-3,0){$x_{2}=1$};
+    \end{scope}
+    
+    \begin{scope}[canvas is xy plane at z=2, thin, gray]
+
+      
+
+      
+      \draw[fill=black!0!white] (-3,6) rectangle (-2,7);
+     \draw[fill=black!11.75!white] (-2,6) rectangle (-1,7);
+      \draw[fill=black!14.29!white] (-1,6) rectangle (0,7);
+      \draw[fill=black!19.04!white] (0,6) rectangle (1,7);
+      \draw[fill=black!14.29!white] (1,6) rectangle (2,7);
+      \draw[fill=black!11.75!white] (2,6) rectangle (3,7);
+      \draw[fill=black!0!white] (3,6) rectangle (4,7);
+      
+       \draw[fill=black!23.17!white] (0,5) rectangle (1,6);
+       \draw[fill=black!26.67!white] (0,4) rectangle (1,5);
+       \draw[fill=black!30.48!white] (0,3) rectangle (1,4);
+       \draw[fill=black!33.97!white] (0,2) rectangle (1,3);
+       \draw[fill=black!37.78!white] (0,1) rectangle (1,2);
+       \draw[fill=black!41.27!white] (0,0) rectangle (1,1);
+       
+       \draw[fill=black!43.7!white] (1,0) rectangle (2,1);
+       \draw[fill=black!48.6!white] (2,0) rectangle (3,1);
+       \draw[fill=black!52.4!white] (3,0) rectangle (4,1);
+       
+             \draw[step=1] (0,0) grid (1,7);
+      \draw[step=1] (1,0) grid (3,1);
+      %\draw[fill=black!20!white] (3,0) rectangle (4,1);
+      \draw[step=1] (-3,6) grid (4,7);
+     
+
+      \node [draw,transform shape] () at (-3,0){$x_{2}=0$};
+      \definecolor{lbc}{RGB}{54,155,255}
+            \draw[fill=lbc] (-3,7) rectangle (-2,8);
+      \draw[fill=lbc] (3,7) rectangle (4,8);
+    \end{scope}
+    
+    \begin{scope}[canvas is xy plane at z=0, thin, gray]
+      %\draw [#1] (\XGridMin,\YGridMin) grid (\XGridMax,\YGridMax);
+      \draw[step=1] (1,0) grid (4,1);
+      \draw[step=1] (0,0) grid (1,7);
+      \draw[step=1] (-3,6) grid (4,7);
+      \draw[step=1] (-3,7) grid (-2,8);
+      \draw[step=1] (3,7) grid (4,8);
+      
+       \draw[fill=black!100!white] (-3,7) rectangle (-2,8);
+      \draw[fill=rp] (3,7) rectangle (4,8);
+      
+       \draw[fill=black!96.1!white] (-3,6) rectangle (-2,7);
+     \draw[fill=black!92.69!white] (-2,6) rectangle (-1,7);
+      \draw[fill=black!88.89!white] (-1,6) rectangle (0,7);
+      \draw[fill=black!85.08!white] (0,6) rectangle (1,7);
+      \draw[fill=black!81.27!white] (1,6) rectangle (2,7);
+      \draw[fill=black!77.14!white] (2,6) rectangle (3,7);
+      \draw[fill=black!51.75!white] (3,6) rectangle (4,7);
+      
+       \draw[fill=black!81.58!white] (0,5) rectangle (1,6);
+       \draw[fill=black!77.78!white] (0,4) rectangle (1,5);
+       \draw[fill=black!74.29!white] (0,3) rectangle (1,4);
+       \draw[fill=black!70.48!white] (0,2) rectangle (1,3);
+       \draw[fill=black!66.98!white] (0,1) rectangle (1,2);
+       \draw[fill=black!63.17!white] (0,0) rectangle (1,1);
+       
+       \draw[fill=black!59.68!white] (1,0) rectangle (2,1);
+       \draw[fill=black!55.87!white] (2,0) rectangle (3,1);
+       \draw[fill=black!52.38!white] (3,0) rectangle (4,1);
+       
+      \node [draw,transform shape] () at (-3,0){$x_{2}=-1$};
+    \end{scope}
+}
+
+
+\usepackage{tikz-3dplot}
+
+\begin{document}
+\tdplotsetmaincoords{0}{0}
+
+\begin{tikzpicture}[
+    tdplot_main_coords, scale=0.5
+    ]
+    
+   
+    \begin{scope}[canvas is xy plane at z=0, thin, gray]
+      \draw[step=1] (1,0) grid (4,1);
+      \draw[step=1] (0,0) grid (1,7);
+      \draw[step=1] (-3,6) grid (4,7);
+      \draw[step=1] (-3,7) grid (-2,8);
+      \draw[step=1] (3,7) grid (4,8);
+      
+          \foreach \position / \label in
+    {(3.25,0.8)/17, (2.25,0.8)/16, (1.25,0.8)/15, (0.25,0.8)/14, (0.25,1.8)/13, (0.25,2.8)/12, (0.25,3.8)/11, (0.25,4.8)/10, (0.25,5.8)/9, (0.25,6.8)/5,
+    (-0.8,6.8)/4, (-1.8,6.8)/3, (-2.8,6.8)/2, (-2.8,7.8)/0, (1.2,6.8)/6, (2.2,6.8)/7, (3.2,6.8)/8, (3.2,7.8)/1}
+  {
+    \draw \position node{\tiny \label};
+  }
+    \end{scope}
+    \foreach \position / \label in
+    {(3.5,0.4)/X, (0.5,3.4)/S, (-2.5,7.4)/H, (3.5,7.4)/H}
+  {
+    \draw \position node (\label){\small \label};
+  }
+\end{tikzpicture}
+%
+\begin{tikzpicture}[
+    tdplot_main_coords, scale=0.5,>=Stealth
+    ]
+
+    \begin{scope}[canvas is xy plane at z=0, thin, gray]
+      \draw[step=1] (1,0) grid (4,1);
+      \draw[step=1] (0,0) grid (1,7);
+      \draw[step=1] (-3,6) grid (4,7);
+      \draw[step=1] (-3,7) grid (-2,8);
+      \draw[step=1] (3,7) grid (4,8);
+  
+      \foreach \position / \label in
+    {(3.25,0.8)/17, (2.25,0.8)/16, (1.25,0.8)/15, (0.25,0.8)/14, (0.25,1.8)/13, (0.25,2.8)/12, (0.25,3.8)/11, (0.25,4.8)/10, (0.25,5.8)/9, (0.25,6.8)/5,
+    (-0.8,6.8)/4, (-1.8,6.8)/3, (-2.8,6.8)/2, (-2.8,7.8)/0, (1.2,6.8)/6, (2.2,6.8)/7, (3.2,6.8)/8, (3.2,7.8)/1}
+  {
+    \draw \position node (\label){\tiny \label};
+  }
+
+    
+       \foreach \nodea/\nodeb in
+    {14/13,13/12,12/11,11/10,10/9,9/5}
+  {
+    \draw [->,color=black]  (\nodea.south east) to[] (\nodeb.south east);
+  }
+        \foreach \nodea/\nodeb in
+    {5/4,4/3,3/2,2/0}
+  {
+    \draw [->,color=black]  (\nodea.south east) to[] (\nodeb.south east);
+  }   
+        \foreach \nodea/\nodeb in
+    {5/6,6/7,7/8,8/1}
+  {
+    \draw [->,color=black]  (\nodea.south east) to[] (\nodeb.south east);
+  }   
+
+    \foreach \nodea/\nodeb in
+    {15/14,16/15,17/16}
+  {
+    \draw [->,color=black]  (\nodea.south east) to[] (\nodeb.south east);
+  }      
+   \end{scope}
+
+\end{tikzpicture}
+
+\tdplotsetmaincoords{70}{50}
+\begin{tikzpicture}[tdplot_main_coords, scale=0.7
+    %z={(0:10mm)},x={(-130:5mm)}%x={(-0.5cm,-0.5cm)}, y={(0.9659cm,-0.25882cm)}, z={(0cm,1cm)}% x-y grid is wacky
+    ]
+    \DrawParallelGrid{0}{4}{0}{4}
+   
+\end{tikzpicture}
+
+\begin{tikzpicture}[tdplot_main_coords, scale=0.7
+    %z={(0:10mm)},x={(-130:5mm)}%x={(-0.5cm,-0.5cm)}, y={(0.9659cm,-0.25882cm)}, z={(0cm,1cm)}% x-y grid is wacky
+    ]
+    \DrawParallelGridb{0}{4}{0}{4}
+\end{tikzpicture}
+
+\begin{tikzpicture}[tdplot_main_coords, scale=0.7
+    %z={(0:10mm)},x={(-130:5mm)}%x={(-0.5cm,-0.5cm)}, y={(0.9659cm,-0.25882cm)}, z={(0cm,1cm)}% x-y grid is wacky
+    ]
+    \DrawParallelGrida{0}{4}{0}{4}
+   
+\end{tikzpicture}
+
+\begin{tikzpicture}[tdplot_main_coords, scale=0.7
+    %z={(0:10mm)},x={(-130:5mm)}%x={(-0.5cm,-0.5cm)}, y={(0.9659cm,-0.25882cm)}, z={(0cm,1cm)}% x-y grid is wacky
+    ]
+        \begin{axis}[
+    hide axis,
+    scale only axis,
+    height=0pt,
+    width=0pt,
+    colormap name=coolblackwhite,
+    colorbar horizontal,
+    point meta min=-100,
+    point meta max=100,
+    colorbar style={
+        width=10cm,
+        xtick={-100,-50,0,50,100}
+    }
+    ]
+    \addplot [draw=none] coordinates {(0,0)};
+\end{axis}    
+\end{tikzpicture}
+
+\end{document}

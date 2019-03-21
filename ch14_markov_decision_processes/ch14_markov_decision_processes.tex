@@ -1,0 +1,180 @@
+\documentclass[11pt, fleqn]{amsart}    
+\usepackage[T1]{fontenc} 
+%\usepackage[latin1]{inputenc}
+%\usepackage[english,francais]{babel}
+\usepackage[retainorgcmds]{IEEEtrantools}   
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{pst-slpe}
+\usepackage{auto-pst-pdf}
+\usepackage{pst-node}
+\usepackage{pst-plot}
+\usepackage{pst-3dplot}
+\usepackage{cancel}
+\usepackage{empheq}
+\usepackage{pst-grad,multido}
+\usepackage{graphicx,url,etoolbox}
+\usepackage{pifont}
+\usepackage{subfig}
+\usepackage{siunitx}
+\usepackage{mathtools}
+\usepackage{filecontents}
+\usepackage{amsthm}
+\usepackage{yhmath}
+\usepackage{enumitem}   
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks = true,
+    linkbordercolor = {white},
+    linkcolor=blue
+}
+%\usepgfplotslibrary{external} 
+\usepackage{standalone}
+%\tikzexternalize
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\usepackage{pstricks-add}
+\let\clipbox\relax
+%\usepackage{pgfplots}
+\usepackage{stmaryrd}
+\usepackage{lipsum}
+%\usepackage{tikz}
+
+\setlength{\textwidth}{\paperwidth}
+\addtolength{\textwidth}{-2in}
+\calclayout
+
+\DeclareMathOperator{\vect}{vec}
+
+\graphicspath{{./include/}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+
+\setcounter{MaxMatrixCols}{20}
+
+\theoremstyle{definition}
+\newtheorem*{Lemma}{Lemma}
+\theoremstyle{definition}
+\newtheorem*{Theorem}{Theorem}
+\theoremstyle{definition}
+\newtheorem*{Definition}{Definition}
+\theoremstyle{definition}
+\newtheorem*{Proposition}{Proposition}
+\theoremstyle{remark}
+\newtheorem*{rmk}{Remark}
+
+\patchcmd{\section}{\scshape}{\bfseries}{}{}
+\makeatletter
+\renewcommand{\@secnumfont}{\bfseries}
+\makeatother
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Lip}{\mathrm{Lip}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+\newcommand{\atgt}{\mathrm{atan2}}
+\newcommand{\KL}{\mathrm{KL}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\I}{\mathrm{I}}
+\newcommand{\p}{\mathrm{p}}
+
+\usepackage{stmaryrd}
+\usepackage{lipsum}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\addtolength{\voffset}{-3cm}
+\addtolength{\textheight}{4cm}
+\newcommand{\ud}{\,\mathrm{d}}
+
+\makeatletter
+\patchcmd{\@settitle}{center}{flushleft}{}{}
+\patchcmd{\@settitle}{center}{flushleft}{}{}
+%\patchcmd{\@setauthors}{\centering}{\raggedright}{}{}
+\patchcmd{\abstract}{3pc}{0pt}{}{} % remove indentation
+\makeatother
+%\pgfplotsset{compat=1.16}
+
+\title{%
+		Probabilistic Robotics: \\
+		Markov decision processes}
+
+\begin{document}
+\maketitle
+\author{Pierre-Paul TACHER}
+
+\setcounter{section}{1}
+\section{} There are planning algorithms like Lifelong Planning $A^{*}$ and Dynamic $A^{*}$ Lite ~\cite{likhachev1} or $D^{*}$ lite~\cite{likhachev2} which adresse the context of time varying cost function and the problem of replanning reusing the results of previous searches.
+
+\section{}
+\subsection{} In this section the actions are deterministic and the state can be described using only the position, using for instance convention in figure~\ref{0}. Note there is no need to use a discount factor $(\gamma=1)$ for future payoff in this setting.  For the mathematically inclined reader, I give a proof of convergence of the value iteration algorithm in the stochastic shortest path setting (which encompass our simple example): cf.~\ref{ssp}. Algorithm is implemented in github repository. The quite obvious 2 equally optimal policies are represented in figure~\ref{1}.
+\begin{figure}
+\includegraphics[width=0.7\textwidth]{tikz1-figure0.pdf}
+\caption{Problem setting}
+\label{0}
+\end{figure}
+\begin{figure}
+\includegraphics[width=0.7\textwidth]{tikz1-figure1.pdf}
+\caption{Optimal policies}
+\label{1}
+\end{figure}
+\subsection{} Optimal policies does not change by introducing a bit of stochasticity in action. See figure~\ref{2} for optimal expected payoff starting from each position.
+\subsection{} We have to add a dimension to the state variable to handle the hidden state variable; there are 3 potential states regarding the knowledge of the position of the final reward. Thus we can modelize the state by
+\begin{IEEEeqnarray*}{rCl}
+x & = & (x_{1}, x_{2}) \in \mathbb{R}^{2}	\\
+\end{IEEEeqnarray*}
+where
+\begin{IEEEeqnarray*}{rCl}
+x_{1} & \in & \llbracket 0, 17 \rrbracket	\\
+\end{IEEEeqnarray*}
+\begin{equation*}
+x_{2} = \left\{ \,
+	\begin{IEEEeqnarraybox}[][c]{l?s}
+		\IEEEstrut
+		-1 & if it is known the reward is on the left, \\
+		0 & in absence of any a priori information, \\
+		+1 & if it is known the reward is on the right
+		\IEEEstrut
+	\end{IEEEeqnarraybox}
+\right.
+\end{equation*}
+The knowledge $x_{2}$ can change only when reaching position $X$ or ending game in either position $H$; the transition are represented in figure~\ref{3}. The expected maximum payoff is represented in figure~\ref{4}. The optimal policy is represented in figure~\ref{5}.
+\begin{figure}
+\includegraphics[width=0.7\textwidth]{tikz1-figure2.pdf}
+\caption{Transition between $x_{2}=0$ and $x_{2}=\epsilon \in \{-1,1\}$}
+\label{3}
+\end{figure}
+\begin{figure}
+\includegraphics[width=0.7\textwidth]{tikz1-figure3.pdf}
+\includegraphics[width=0.7\textwidth]{tikz1-figure5.pdf}
+\caption{States values}
+\label{4}
+\end{figure}
+\begin{figure}
+\includegraphics[width=0.7\textwidth]{tikz1-figure4.pdf}
+\caption{Optimal policy}
+\label{5}
+\end{figure}
+
+\clearpage
+\appendix
+\section{} 
+\subsection{}
+\label{ssp}
+\begin{Proposition} To do.
+\end{Proposition} 
+\begin{proof}
+\end{proof}
+\clearpage
+{\small
+\begin{thebibliography}{99}
+\bibitem{likhachev1} Likhachev,~Maxim; Koenig,~Sven: 
+\emph{Lifelong Planning A* and Dynamic A* Lite: The proofs},
+(2001)
+\bibitem{likhachev2} Likhachev,~Maxim; Koenig,~Sven: 
+\emph{D* lite},
+American Association for Artificial Intelligence (2002)
+\end{thebibliography}
+}
+\end{document}
