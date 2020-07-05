@@ -4,7 +4,7 @@ I am working on detailed solutions of exercises of the book "probabilistic robot
 ![alt text](https://github.com/pptacher/probabilistic_robotics/blob/master/ch12_the_sparse_extended_information_filter/seif.jpg)
 ***SEIF** algorithm running on Victoria Park dataset*
 
-I also dockerized the fastslam nodejs/c++ app and put it online with google cloud [here](http://35.242.140.13).
+I also dockerized the fastslam nodejs/c++ app and put it online with google cloud [here](http://34.89.86.35).
 
 
 ## references
