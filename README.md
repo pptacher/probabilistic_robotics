@@ -1,7 +1,7 @@
 # probabilistic_robotics
 I am working on detailed solutions of exercises of the book "probabilistic robotics". This is a work in progress, any helpful feedback is welcomed.
 
-I also deployed the fastslam nodejs/c++ app on google cloud [here](http://34.89.86.35:8080).
+I also deployed the fastslam nodejs/c++ app on google cloud [here](http://35.242.140.13:8080).
 
 ![alt text](https://github.com/pptacher/probabilistic_robotics/blob/master/ch12_the_sparse_extended_information_filter/seif.jpg)
 ***SEIF** algorithm running on Victoria Park dataset*
